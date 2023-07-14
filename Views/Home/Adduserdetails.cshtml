@@ -1,0 +1,47 @@
+﻿@model EMPLOYEE_MANAGEMENT.Models.UserDetails
+@{
+    ViewBag.Title = "AddUserDetails";
+}
+<form method="post" action="Add" class="mt-5">
+    <div class="mb-3">
+        <label for="" class="form-label">FirstName</label>
+        <input type="text" class="form-control" id="FirstName" asp-for="FirstName" required>
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">LastName</label>
+        <input type="text" class="form-control" id="FirstName" asp-for="LastName" required>
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Number</label>
+        <input type="number" class="form-control" id="Number" asp-for="Number" required>
+    </div>
+    <div class="mb-3">
+        <label for="Gender" class="form-label">Gender</label>
+        <select class="form-control" id="Gender" asp-for="Gender" required>
+            <option value="">--select an option--</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="DOB" class="form-label">DOB</label>
+        <input type="datetime" class="form-control" id="DOB" asp-for="DOB" required>
+    </div>
+    <div class="mb-3">
+        <label for="Age" class="form-label">Age</label>
+        <input type="number" class="form-control" id="Age" asp-for="Age" required />
+    </div>
+    <div class="mb-3">
+        <label for="Address" class="form-label">Address</label>
+        <input type="text" class="form-control" id="Address" asp-for="Address" required>
+    </div>
+    <div class="mb-3">
+        <label for="Salary" class="form-label">Salary</label>
+        <input type="number" class="form-control" id="Salary" asp-for="Salary" required>
+    </div>
+    <div class="mb-3">
+        <label for="Department" class="form-label">Department</label>
+        <input type="text" class="form-control" id="Department" asp-for="Department" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
