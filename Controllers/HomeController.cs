@@ -1,6 +1,7 @@
 ﻿using EMPLOYEE_MANAGEMENT.DAL;
 using EMPLOYEE_MANAGEMENT.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Diagnostics;
 using System.Security.Cryptography;
@@ -22,6 +23,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return View();
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Add(User user)
         {
@@ -34,7 +36,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 var newUser = new User()
                 {
                     Email = user.Email,
-                    Password = Encrypt(user.Password),
+                    Password = Encrypt(RandomPassword()),
                     Role = user.Role,
                     ProfilesetupCompleted = ProfileStatus.INACTIVE.ToString()
                 };
@@ -43,7 +45,32 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             }    
             return RedirectToAction("Index");
         }
-
+        public IActionResult Login()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Login(User user)
+        {
+            if (user.Email == null || user.Password == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            if (newUser == null)
+            {
+                throw new ArgumentException("user");
+            }
+            if (newUser.Email != user.Email || !VerifyPassword(user.Password, newUser.Password)) {
+                throw new InvalidDataException("user");
+            }
+            /*if (newUser.Email == user.Email && VerifyPassword(user.Password, newUser.Password){
+                if (newUser.Role == Role.ADMIN.ToString()) {
+                    return RedirectToAction("Add");
+                }
+            }*/
+            return RedirectToAction("Add");
+        }
         public static string Encrypt(string password)
         {
             using (SHA256 sha = SHA256.Create())
@@ -66,6 +93,21 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
                 return StructuralComparisons.StructuralEqualityComparer.Equals(storedHashedBytes, enteredHashedBytes);
             }
+        }
+
+        public string RandomPassword()
+        {
+            var passwordBuilder = new StringBuilder();
+
+            // 4-Letters lower case
+            passwordBuilder.Append(RandomString(4, true));
+
+            // 4-Digits between 1000 and 9999
+            passwordBuilder.Append(RandomNumber(1000, 9999));
+
+            // 2-Letters upper case
+            passwordBuilder.Append(RandomString(2));
+            return passwordBuilder.ToString();
         }
 
         public IActionResult Index()

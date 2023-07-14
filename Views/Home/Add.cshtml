@@ -2,14 +2,10 @@
 @{
     ViewBag.Title = "Create";
 }
-<form method="post" action="Add" class="mt-5" onsubmit="return validateForm()">
+<form method="post" action="Add" class="mt-5">
     <div class="mb-3">
         <label for="" class="form-label">Email</label>
-        <input type="text" class="form-control" id="Email" asp-for="Email" required>
-    </div>
-    <div class="mb-3">
-        <label for="" class="form-label">Password</label>
-        <input type="password" class="form-control" id="Password" asp-for="Password" required>
+        <input type="email" class="form-control" id="Email" asp-for="Email" required>
     </div>
     <div class="mb-3">
         <label for="Role" class="form-label">Role</label>
