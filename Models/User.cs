@@ -1,8 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EMPLOYEE_MANAGEMENT.Models
 {
@@ -28,6 +25,14 @@ namespace EMPLOYEE_MANAGEMENT.Models
         public String ProfilesetupCompleted { get; set; }
 
         public UserDetails UserDetails { get; set; }
+
+        [DisplayName("OTP: ")]
+        [Required]
+        public double OTP { get; set; }
+
+        [DisplayName("OTPGeneratedTime: ")]
+        [Required]
+        public DateTime OTPGeneratedTime { get; set; }
 
     }
 }

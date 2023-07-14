@@ -1,0 +1,23 @@
+﻿@model EMPLOYEE_MANAGEMENT.DTO.RegisterDTO
+@{
+    ViewBag.Title = "Login";
+}
+<form method="post" action="Register" class="mt-5">
+    <div class="mb-3">
+        <label for="" class="form-label">OTP</label>
+        <input type="number" class="form-control" id="OTP" asp-for="OTP" required>
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Old Password</label>
+        <input type="password" class="form-control" id="Password" asp-for="Password" required>
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">New Password</label>
+        <input type="password" class="form-control" id="Password" asp-for="NewPassword" required>
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Confirm New Password</label>
+        <input type="password" class="form-control" id="Password" asp-for="ConfirmNewpassword" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

@@ -12,6 +12,8 @@ namespace EMPLOYEE_MANAGEMENT.DAL
         public DbSet<User> Users { get; set; }
         public DbSet<UserDetails> UserDetails { get; set; }
 
+        public DbSet<Department> Departments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()

@@ -1,4 +1,5 @@
 ﻿using EMPLOYEE_MANAGEMENT.DAL;
+using EMPLOYEE_MANAGEMENT.DTO;
 using EMPLOYEE_MANAGEMENT.Models;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
@@ -22,11 +23,67 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             this.applicationDbContext = applicationDbContext;
         }
 
-        public IActionResult Add()
+        public IActionResult Login()
         {
             return View();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Login(User user)
+        {
+            if (user.Email == null || user.Password == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+
+            var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            if (newUser == null)
+            {
+                throw new ArgumentException("user");
+            }
+            if (newUser.Email != user.Email || !VerifyPassword(user.Password, newUser.Password))
+            {
+                throw new InvalidDataException("user");
+            }
+            if (newUser.Email == user.Email && VerifyPassword(user.Password, newUser.Password))
+            {
+                if (newUser.ProfilesetupCompleted == ProfileStatus.INACTIVE.ToString())
+                {
+                    HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
+                    return RedirectToAction("Register");
+                }
+                else if (newUser.ProfilesetupCompleted == ProfileStatus.PENDING.ToString())
+                {
+                    HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
+                    return RedirectToAction("AddUserDetails");
+                }
+                if (newUser.Role == Role.ADMIN.ToString())
+                {
+                    HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
+                    return RedirectToAction("Add");
+                }
+                else if (newUser.Role == Role.DEPARTMENT_HEAD.ToString())
+                {
+                    return RedirectToAction("Add");
+                }
+                else
+                {
+                    return RedirectToAction();
+                }
+            }
+            return RedirectToAction("Home");
+        }
+
+        public IActionResult Add()
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Session value not found, handle accordingly
+                return RedirectToAction("Login");
+            }
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Add(User user)
@@ -35,8 +92,9 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             {
                 throw new ArgumentNullException("user");
             }
+
             var password = RandomPassword();
-            if(user !=null)
+            if (user != null)
             {
                 var newUser = new User()
                 {
@@ -45,39 +103,96 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                     Role = user.Role,
                     ProfilesetupCompleted = ProfileStatus.INACTIVE.ToString()
                 };
+                double otp = RandomNumber(100000, 999999);
+                DateTime dateTime = DateTime.Now;
+                newUser.OTP = otp;
+                newUser.OTPGeneratedTime= dateTime;
                 await applicationDbContext.Users.AddAsync(newUser);
                 await applicationDbContext.SaveChangesAsync();
                 //sending email using SMTP
-                sendOTPEmail(user.Email, password);         
-            }    
+                sendOTPEmail(user.Email, password, otp, user.Role.ToString());
+            }
             return RedirectToAction("Index");
         }
-        public IActionResult Login()
+
+        public IActionResult Register()
         {
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Login(User user)
+        public async Task<IActionResult> Register(RegisterDTO register)
         {
-            if (user.Email == null || user.Password == null)
+            String UserId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(UserId))
             {
-                throw new ArgumentNullException("user");
+                return RedirectToAction("Login");
             }
-            var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(UserId));
+
+            if (register == null)
+            {
+                throw new ArgumentNullException();
+            }
+            if (TimeDifference(newUser.OTPGeneratedTime))
+            {
+                double otp = RandomNumber(100000, 999999);
+
+                DateTime date = DateTime.Now;
+
+                newUser.OTP = otp;
+                newUser.OTPGeneratedTime=date;
+
+                applicationDbContext.Users.Update(newUser);
+                await applicationDbContext.SaveChangesAsync();
+                HttpContext.Session.SetString("UserId", UserId);
+                sendOTPEmail(newUser.Email, "", otp, newUser.Role.ToString());
+                return RedirectToAction("Register");
+            }
+            if (!VerifyPassword(register.Password, newUser.Password))
+            {
+                throw new InvalidDataException("Entered Password is Incorrect");
+            }
+            if (register.NewPassword == register.ConfirmNewpassword && register.OTP == newUser.OTP)
+            {
+                newUser.Password = Encrypt(register.NewPassword);
+                newUser.ProfilesetupCompleted = ProfileStatus.PENDING.ToString();
+                applicationDbContext.Users.Update(newUser);
+                await applicationDbContext.SaveChangesAsync();
+                HttpContext.Session.SetString("UserId", UserId);
+                return RedirectToAction("AddUserDetails");
+            }
+
+            return View();
+        }
+
+        public IActionResult AddUserDetails()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddUserDetails(UserDetails userDetails)
+        {
+            String userId = HttpContext.Session.GetString("UserId");
+            if (String.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login");
+            }
+            var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(userId));
             if (newUser == null)
             {
-                throw new ArgumentException("user");
+                throw new InvalidDataException($"User {userId} was not found.");
             }
-            if (newUser.Email != user.Email || !VerifyPassword(user.Password, newUser.Password)) {
-                throw new InvalidDataException("user");
-            }
-            /*if (newUser.Email == user.Email && VerifyPassword(user.Password, newUser.Password){
-                if (newUser.Role == Role.ADMIN.ToString()) {
-                    return RedirectToAction("Add");
-                }
-            }*/
-            return RedirectToAction("Add");
+            var NewUserDetails = new UserDetails()
+            {
+                FirstName = userDetails.FirstName,
+                LastName = userDetails.LastName
+            };
+            return View();
+
         }
+
+
         public static string Encrypt(string password)
         {
             using (SHA256 sha = SHA256.Create())
@@ -138,18 +253,16 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return passwordBuilder.ToString();
         }
 
-        public void sendOTPEmail(String email, String password)
+        public void sendOTPEmail(String email, String password, double otp, String role)
         {
             using (var client = new SmtpClient())
             {
                 client.Connect("smtp.gmail.com");
                 client.Authenticate("v4431365@gmail.com", "iponuhntztqltauh");
-
-                var otp = RandomNumber(100000, 999999);
                 var bodyBuilder = new BodyBuilder
                 {
-                    HtmlBody = $"<p>Your Password is {password}</p> <p>Your OTP is {otp}</p>",
-                    TextBody = "{password} \r\n {otp}"
+                    HtmlBody = $"<p>Your Password is {password}</p> <p>Your OTP is {otp}</p> <p>Your Role is {role}</p>",
+                    TextBody = "{password} \r\n {otp} \r\n {role}"
                 };
 
                 var message = new MimeMessage
@@ -162,8 +275,18 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 client.Send(message);
 
                 client.Disconnect(true);
-
             }
+        }
+
+        public Boolean TimeDifference(DateTime timeDifference)
+        {
+            DateTime currentTime = DateTime.Now;
+            TimeSpan time = currentTime-timeDifference;
+            if ((int)time.TotalMinutes >= 5)
+            {
+                return true;
+            }
+            return false;
         }
 
         public IActionResult Index()

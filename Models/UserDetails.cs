@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EMPLOYEE_MANAGEMENT.Models
@@ -8,8 +7,8 @@ namespace EMPLOYEE_MANAGEMENT.Models
     public class UserDetails
     {
         [Key]
-        [DisplayName("DetailsId: ")]
-        public Guid DetailsId { get; set; }
+        [DisplayName("Id: ")]
+        public Guid Id { get; set; }
 
         [DisplayName("FirstName: ")]
         [Required]
@@ -40,10 +39,6 @@ namespace EMPLOYEE_MANAGEMENT.Models
         [DisplayName("Address: ")]
         [Required]
         public string Address { get; set; }
-
-        [DisplayName("Email: ")]
-        [Required]
-        public string Email { get; set; }
 
         [DisplayName("Department: ")]
         [Required]
