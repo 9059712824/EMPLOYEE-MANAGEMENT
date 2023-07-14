@@ -25,11 +25,11 @@
     </div>
     <div class="mb-3">
         <label for="DOB" class="form-label">DOB</label>
-        <input type="datetime" class="form-control" id="DOB" asp-for="DOB" required>
+        <input type="date" class="form-control" id="DOB" asp-for="DOB" onchange="calculateAge()" required>
     </div>
     <div class="mb-3">
         <label for="Age" class="form-label">Age</label>
-        <input type="number" class="form-control" id="Age" asp-for="Age" required />
+        <input type="number" class="form-control" id="Age" asp-for="Age" required readonly/>
     </div>
     <div class="mb-3">
         <label for="Address" class="form-label">Address</label>
@@ -45,3 +45,21 @@
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+<script>
+    function calculateAge() {
+        var dobInput = document.getElementById('DOB').value;
+        var dob = new Date(dobInput);
+        var currentDate = new Date();
+
+        var age = currentDate.getFullYear() - dob.getFullYear();
+
+        if (currentDate.getMonth() < dob.getMonth()) {
+            age--;
+        }
+        else if (currentDate.getMonth() === dob.getMonth() && currentDate.getDate() < dob.getDate()) {
+            age--;
+        }
+
+        document.getElementById('Age').value = age;
+    }
+</script>

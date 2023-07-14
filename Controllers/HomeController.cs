@@ -186,10 +186,24 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             var NewUserDetails = new UserDetails()
             {
                 FirstName = userDetails.FirstName,
-                LastName = userDetails.LastName
+                LastName = userDetails.LastName,
+                Number = userDetails.Number,
+                Gender = userDetails.Gender,
+                Address = userDetails.Address,
+                DOB = userDetails.DOB,
+                Age = userDetails.Age,
+                Department = userDetails.Department,
+                Salary = userDetails.Salary,
+                User = newUser,
             };
-            return View();
+            await applicationDbContext.UserDetails.AddAsync(NewUserDetails);
+            await applicationDbContext.SaveChangesAsync();
 
+            newUser.ProfilesetupCompleted = ProfileStatus.ACTIVE.ToString();
+            applicationDbContext.Users.Update(newUser);
+            await applicationDbContext.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
 
 

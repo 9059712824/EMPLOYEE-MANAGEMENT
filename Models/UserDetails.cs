@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,10 +7,6 @@ namespace EMPLOYEE_MANAGEMENT.Models
 {
     public class UserDetails
     {
-        [Key]
-        [DisplayName("Id: ")]
-        public Guid Id { get; set; }
-
         [DisplayName("FirstName: ")]
         [Required]
         public string FirstName { get; set; }
@@ -49,10 +46,9 @@ namespace EMPLOYEE_MANAGEMENT.Models
         public double Salary { get; set; }
 
         [DisplayName("UserId: ")]
-        [Required]
+        [ForeignKey("User")]
         public Guid UserId { get; set; }
 
-        [ForeignKey("UserId")]
         public User User { get; set; }
     }
 }
