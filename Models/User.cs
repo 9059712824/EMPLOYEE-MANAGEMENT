@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EMPLOYEE_MANAGEMENT.Models
 {
@@ -19,11 +21,11 @@ namespace EMPLOYEE_MANAGEMENT.Models
 
         [DisplayName("Role: ")]
         [Required]
-        public Role Role { get; set; }
+        public String Role { get; set; }
 
         [DisplayName("ProfilesetupCompleted")]
         [Required]
-        public ProfileStatus ProfilesetupCompleted { get; set; }
+        public String ProfilesetupCompleted { get; set; }
 
         public UserDetails UserDetails { get; set; }
 

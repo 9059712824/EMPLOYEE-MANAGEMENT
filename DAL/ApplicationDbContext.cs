@@ -23,6 +23,8 @@ namespace EMPLOYEE_MANAGEMENT.DAL
             modelBuilder.Entity<UserDetails>()
                 .HasKey(up => up.UserId);
 
+            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
             modelBuilder.Entity<UserDetails>()
                 .HasOne(up => up.User)
                 .WithOne(u => u.UserDetails)
