@@ -1,7 +1,9 @@
 ﻿using EMPLOYEE_MANAGEMENT.DAL;
 using EMPLOYEE_MANAGEMENT.Models;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MimeKit;
 using System.Collections;
 using System.Diagnostics;
 using System.Security.Cryptography;
@@ -12,6 +14,8 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext applicationDbContext;
+
+        private readonly Random _random = new Random();
 
         public HomeController(ApplicationDbContext applicationDbContext)
         {
@@ -31,17 +35,20 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             {
                 throw new ArgumentNullException("user");
             }
+            var password = RandomPassword();
             if(user !=null)
             {
                 var newUser = new User()
                 {
                     Email = user.Email,
-                    Password = Encrypt(RandomPassword()),
+                    Password = Encrypt(password),
                     Role = user.Role,
                     ProfilesetupCompleted = ProfileStatus.INACTIVE.ToString()
                 };
                 await applicationDbContext.Users.AddAsync(newUser);
                 await applicationDbContext.SaveChangesAsync();
+                //sending email using SMTP
+                sendOTPEmail(user.Email, password);         
             }    
             return RedirectToAction("Index");
         }
@@ -95,6 +102,27 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             }
         }
 
+        public int RandomNumber(int min, int max)
+        {
+            return _random.Next(min, max);
+        }
+
+        public string RandomString(int size, bool lowerCase = false)
+        {
+            var builder = new StringBuilder(size);
+
+            char offset = lowerCase ? 'a' : 'A';
+            const int lettersOffset = 26; // A...Z or a..z: length=26
+
+            for (var i = 0; i < size; i++)
+            {
+                var @char = (char)_random.Next(offset, offset + lettersOffset);
+                builder.Append(@char);
+            }
+
+            return lowerCase ? builder.ToString().ToLower() : builder.ToString();
+        }
+
         public string RandomPassword()
         {
             var passwordBuilder = new StringBuilder();
@@ -108,6 +136,34 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             // 2-Letters upper case
             passwordBuilder.Append(RandomString(2));
             return passwordBuilder.ToString();
+        }
+
+        public void sendOTPEmail(String email, String password)
+        {
+            using (var client = new SmtpClient())
+            {
+                client.Connect("smtp.gmail.com");
+                client.Authenticate("v4431365@gmail.com", "iponuhntztqltauh");
+
+                var otp = RandomNumber(100000, 999999);
+                var bodyBuilder = new BodyBuilder
+                {
+                    HtmlBody = $"<p>Your Password is {password}</p> <p>Your OTP is {otp}</p>",
+                    TextBody = "{password} \r\n {otp}"
+                };
+
+                var message = new MimeMessage
+                {
+                    Body = bodyBuilder.ToMessageBody()
+                };
+                message.From.Add(new MailboxAddress("OTP", "v4431365@gmail.com"));
+                message.To.Add(new MailboxAddress("", email));
+                message.Subject= "Otp For Account Validation";
+                client.Send(message);
+
+                client.Disconnect(true);
+
+            }
         }
 
         public IActionResult Index()
