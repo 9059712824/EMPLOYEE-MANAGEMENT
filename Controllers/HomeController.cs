@@ -39,7 +39,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
             if (newUser == null)
             {
-                throw new ArgumentException("user");
+               return NotFound(user.Email);
             }
             if (newUser.Email != user.Email || !VerifyPassword(user.Password, newUser.Password))
             {
@@ -64,6 +64,8 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 }
                 else if (newUser.Role == Role.DEPARTMENT_HEAD.ToString())
                 {
+                    HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
+                    HttpContext.Session.SetString("Role", newUser.Role.ToString());
                     return RedirectToAction("Add");
                 }
                 else
@@ -77,9 +79,9 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         public IActionResult Add()
         {
             var userId = HttpContext.Session.GetString("UserId");
+            ViewBag.Role = HttpContext.Session.GetString("Role");
             if (string.IsNullOrEmpty(userId))
             {
-                // Session value not found, handle accordingly
                 return RedirectToAction("Login");
             }
             return View();
@@ -117,16 +119,17 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
         public IActionResult Register()
         {
+            String UserId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(UserId))
+            {
+                return RedirectToAction("Login");
+            }
             return View();
         }
         [HttpPost]
         public async Task<IActionResult> Register(RegisterDTO register)
         {
             String UserId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(UserId))
-            {
-                return RedirectToAction("Login");
-            }
             var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(UserId));
 
             if (register == null)
@@ -167,6 +170,12 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
         public IActionResult AddUserDetails()
         {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Session value not found, handle accordingly
+                return RedirectToAction("Login");
+            }
             return View();
         }
 
@@ -174,10 +183,6 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         public async Task<IActionResult> AddUserDetails(UserDetails userDetails)
         {
             String userId = HttpContext.Session.GetString("UserId");
-            if (String.IsNullOrEmpty(userId))
-            {
-                return RedirectToAction("Login");
-            }
             var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(userId));
             if (newUser == null)
             {
@@ -204,6 +209,64 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             await applicationDbContext.SaveChangesAsync();
 
             return RedirectToAction("Index");
+        }
+
+        public IActionResult AddAcademicDetails()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddAcademicDetails(List<AcademicDetails> academicDetails)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Login");
+            }
+
+            string userId = HttpContext.Session.GetString("UserId");
+            var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(userId));
+            if (newUser == null)
+            {
+                throw new InvalidDataException(userId);
+            }
+
+            if (academicDetails == null)
+            {
+                throw new InvalidDataException();
+            }
+
+            if (academicDetails.Count == 0)
+            {
+                throw new InvalidDataException("No academic details provided");
+            }
+
+            foreach (var academicDetail in academicDetails)
+            {
+                if (academicDetail.proof != null && academicDetail.proof.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        /*await academicDetail.proof.CopyToAsync(memoryStream);
+                        byte[] proofBytes = memoryStream.ToArray();*/
+
+                        var result = new AcademicDetails()
+                        {
+                            Name = academicDetail.Name,
+                            StartYear = academicDetail.StartYear,
+                            EndYear = academicDetail.EndYear,
+                            proof = academicDetail.proof,
+                            User = newUser
+                        };
+
+                        await applicationDbContext.AcademicDetails.AddAsync(result);
+                        await applicationDbContext.SaveChangesAsync();
+                    }
+                }
+            }
+
+            // Return a success response or redirect to another page
+            return RedirectToAction("Index", "Home");
         }
 
 

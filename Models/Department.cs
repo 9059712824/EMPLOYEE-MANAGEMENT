@@ -12,5 +12,9 @@ namespace EMPLOYEE_MANAGEMENT.Models
         [Required]
         [DisplayName("Department Name: ")]
         public String DepartmentName { get; set; }
+
+        [Required]
+        [DisplayName("Department Head")]
+        public String DepartmentHead { get; set;}
     }
 }

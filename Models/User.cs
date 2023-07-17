@@ -24,8 +24,6 @@ namespace EMPLOYEE_MANAGEMENT.Models
         [Required]
         public String ProfilesetupCompleted { get; set; }
 
-        public UserDetails UserDetails { get; set; }
-
         [DisplayName("OTP: ")]
         [Required]
         public double OTP { get; set; }
@@ -33,6 +31,12 @@ namespace EMPLOYEE_MANAGEMENT.Models
         [DisplayName("OTPGeneratedTime: ")]
         [Required]
         public DateTime OTPGeneratedTime { get; set; }
+
+        public UserDetails UserDetails { get; set; }
+
+        public AcademicDetails AcademicDetails { get; set; }
+
+        public Experience Experience { get; set; }
 
     }
 }

@@ -4,13 +4,16 @@
 }
 <form method="post" action="Add" class="mt-5">
     <div class="mb-3">
-        <label for="" class="form-label">Email</label>
+        <label for="Email" class="form-label">Email</label>
         <input type="email" class="form-control" id="Email" asp-for="Email" required>
     </div>
     <div class="mb-3">
         <label for="Role" class="form-label">Role</label>
         <select class="form-control" id="Role" asp-for="Role" required>
-            <option value="DEPARTMENT_HEAD">Department Head</option>
+            @if (ViewBag.Role != "DEPARTMENT_HEAD")
+            {
+                <option value="DEPARTMENT_HEAD">Department Head</option>
+            }
             <option value="EMPLOYEE">Employee</option>
         </select>
     </div>

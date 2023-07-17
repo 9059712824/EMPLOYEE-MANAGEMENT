@@ -14,6 +14,10 @@ namespace EMPLOYEE_MANAGEMENT.DAL
 
         public DbSet<Department> Departments { get; set; }
 
+        public DbSet<AcademicDetails> AcademicDetails { get; set; }
+
+        public DbSet<Experience> Experience { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
@@ -25,13 +29,28 @@ namespace EMPLOYEE_MANAGEMENT.DAL
             modelBuilder.Entity<UserDetails>()
                 .HasKey(up => up.UserId);
 
-            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
 
-            modelBuilder.Entity<UserDetails>()
-                .HasOne(up => up.User)
-                .WithOne(u => u.UserDetails)
-                .HasForeignKey<UserDetails>(up => up.UserId)
-                .OnDelete(DeleteBehavior.Cascade); // Ensure cascaded deletion of User when UserDetails is deleted
+            modelBuilder.Entity<AcademicDetails>()
+                .HasKey(up => up.UserId);
+
+            modelBuilder.Entity<AcademicDetails>()
+                .HasOne(ad => ad.User)
+                .WithOne(u => u.AcademicDetails)
+                .HasForeignKey<AcademicDetails>(ad => ad.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Experience>()
+                .HasKey(up => up.UserId);
+
+            modelBuilder.Entity<Experience>()
+                .HasOne(ex => ex.User)
+                .WithOne(u => u.Experience)
+                .HasForeignKey<Experience>(ex => ex.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
+
     }
 }
