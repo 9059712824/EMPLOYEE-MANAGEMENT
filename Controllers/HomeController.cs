@@ -215,53 +215,53 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         {
             return View();
         }
-
         [HttpPost]
-        public async Task<IActionResult> AddAcademicDetails(List<AcademicDetailsDTO> academicDetails)
+        public async Task<IActionResult> AddAcademicDetails(AcademicDetailsDTO academicDetail, IFormFile proof)
         {
             if (!ModelState.IsValid)
             {
+                // Debug: Output the model validation errors to the console
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        Console.WriteLine(error.ErrorMessage);
+                    }
+                }
+
                 return RedirectToAction("Login");
             }
 
-            string userId = HttpContext.Session.GetString("UserId");
-            var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(userId));
+            Guid userId = Guid.Parse(HttpContext.Session.GetString("UserId"));
+            var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
             if (newUser == null)
             {
-                throw new InvalidDataException(userId);
+                throw new InvalidDataException(userId.ToString());
             }
 
-            if (academicDetails == null)
+            if (academicDetail == null)
             {
                 throw new InvalidDataException();
             }
 
-            if (academicDetails.Count == 0)
+            if (proof != null && proof.Length > 0)
             {
-                throw new InvalidDataException("No academic details provided");
-            }
-
-            foreach (var academicDetail in academicDetails)
-            {
-                if (academicDetail.proof != null && academicDetail.proof.Length > 0)
+                using (var memoryStream = new MemoryStream())
                 {
-                    using (var memoryStream = new MemoryStream())
+                    await proof.CopyToAsync(memoryStream);
+                    byte[] proofBytes = memoryStream.ToArray();
+
+                    var result = new AcademicDetails()
                     {
-                        /*await academicDetail.proof.CopyToAsync(memoryStream);
-                        byte[] proofBytes = memoryStream.ToArray();*/
+                        Name = academicDetail.Name,
+                        StartYear = Convert.ToInt32(academicDetail.StartYear),
+                        EndYear = Convert.ToInt32(academicDetail.EndYear),
+                        proof = proofBytes,
+                        User = newUser
+                    };
 
-                        var result = new AcademicDetails()
-                        {
-                            Name = academicDetail.Name,
-                            StartYear = academicDetail.StartYear,
-                            EndYear = academicDetail.EndYear,
-                            proof = academicDetail.proof,
-                            User = newUser
-                        };
-
-                        await applicationDbContext.AcademicDetails.AddAsync(result);
-                        await applicationDbContext.SaveChangesAsync();
-                    }
+                    await applicationDbContext.AcademicDetails.AddAsync(result);
+                    await applicationDbContext.SaveChangesAsync();
                 }
             }
 
