@@ -217,7 +217,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAcademicDetails(List<AcademicDetails> academicDetails)
+        public async Task<IActionResult> AddAcademicDetails(List<AcademicDetailsDTO> academicDetails)
         {
             if (!ModelState.IsValid)
             {

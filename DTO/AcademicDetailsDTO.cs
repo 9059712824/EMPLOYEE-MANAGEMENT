@@ -9,5 +9,7 @@ namespace EMPLOYEE_MANAGEMENT.DTO
         public int StartYear { get; set; }
 
         public int EndYear { get; set; }
+
+        public byte[] proof { get; set; }
     }
 }
