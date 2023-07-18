@@ -430,7 +430,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         {
             using (var client = new SmtpClient())
             {
-                client.Connect("smtp.gmail.com");
+                client.Connect("smtp.gmail.com", 587);
                 client.Authenticate("v4431365@gmail.com", "iponuhntztqltauh");
                 var bodyBuilder = new BodyBuilder
                 {
