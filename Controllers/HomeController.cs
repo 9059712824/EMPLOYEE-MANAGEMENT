@@ -238,6 +238,12 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
         public IActionResult AddAcademicDetails()
         {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Session value not found, handle accordingly
+                return RedirectToAction("Login");
+            }
             return View();
         }
         [HttpPost]
