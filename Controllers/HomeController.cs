@@ -185,18 +185,8 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
             return View();
         }
-       /* public IActionResult ViewEmployeeDetails()
-        {
-            var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId))
-            {
-                // Session value not found, handle accordingly
-                return RedirectToAction("Login");
-            }
-            return View();
-        }*/
         [HttpGet]
-        public async Task<IActionResult> ViewUserDetails( )
+        public async Task<IActionResult> ViewUserDetails()
         {
             var userId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId))
@@ -207,7 +197,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             var userDetails = await applicationDbContext.UserDetails.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(userId));
             if (userDetails == null)
             {
-                throw new InvalidDataException("user details not found");
+                return RedirectToAction("AddUserDetails");
             }
             return View(userDetails);
         }
@@ -331,6 +321,11 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             List<AcademicDetails> academicDetails = await applicationDbContext.AcademicDetails
                 .Where(ad => ad.UserId == Guid.Parse(userId))
                 .ToListAsync();
+
+            if(academicDetails == null)
+            {
+                return RedirectToAction("AddAcademicDetails");
+            }
 
             return View(academicDetails);
         }
