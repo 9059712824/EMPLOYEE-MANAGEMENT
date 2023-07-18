@@ -6,11 +6,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EMPLOYEE_MANAGEMENT.Migrations
 {
     /// <inheritdoc />
-    public partial class create1 : Migration
+    public partial class create : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+      
             migrationBuilder.CreateTable(
                 name: "AcademicDetails",
                 columns: table => new
@@ -80,6 +81,8 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+          
         }
 
         /// <inheritdoc />
