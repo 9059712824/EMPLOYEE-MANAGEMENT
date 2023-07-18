@@ -1,0 +1,35 @@
+﻿@model EMPLOYEE_MANAGEMENT.Models.Experience
+@{
+    ViewBag.Title = "View Experience Details";
+}
+<form method="post" action="ViewExperienceDetails" class="mt-5" enctype="multipart/form-data">
+    <div id="academicContainer">
+        <div class="academicEntry">
+            <div class="mb-3">
+                <label for="CompanyName" class="form-label">Company Name</label>
+                <input type="text" name="CompanyName" required>
+            </div>
+            <div class="mb-3">
+                <label for="StartDate" class="form-label">Start Date</label>
+                <input type="date" name="StartDate" required>
+            </div>
+            <div class="mb-3">
+                <label for="EndDate" class="form-label">End Date</label>
+                <input type="date" name="EndDate" required>
+            </div>
+            <div class="mb-3">
+                <label for="YearsOfWorking" class="form-label">Years of Working</label>
+                <input type="number" name="YearsOfWorking" required>
+            </div>
+            <div class="mb-3">
+                <label for="Filename" class="form-label">Filename</label>
+                <input type="text" name="Filename" required>
+            </div>
+            <div class="mb-3">
+                <label for="proof" class="form-label">Proof</label>
+                <input type="file" name="proof" required />
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

@@ -91,7 +91,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                     return RedirectToAction();
                 }
             }
-            return RedirectToAction("Home");
+            return RedirectToAction("Add");
         }
 
         public IActionResult Add()
@@ -310,6 +310,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return RedirectToAction("ViewAcademicDetails");
         }
 
+
         public async Task<IActionResult> ViewAcademicDetails()
         {
             var userId = HttpContext.Session.GetString("UserId");
@@ -329,7 +330,57 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
             return View(academicDetails);
         }
+        public IActionResult AddExperienceDetails()
+        {
+            var userId=HttpContext.Session.GetString("UserId");
+            if(string.IsNullOrEmpty(userId)) {
+                return RedirectToAction("Login");
+            }
+            return View();
 
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddExperienceDetails(Experience experience,IFormFile proof)
+        {
+            if(!ModelState.IsValid)
+            {
+                return RedirectToAction("Login");
+            }
+            Guid userId=Guid.Parse(HttpContext.Session.GetString("UserId"));
+            var newUser=await applicationDbContext.Experience.FirstOrDefaultAsync(ad => ad.UserId == userId);
+            if (newUser == null)
+            {
+                throw new InvalidDataException(userId.ToString());
+            }
+            if(experience==null)
+            {
+                throw new ArgumentNullException("invalid data" +experience);
+            }
+            if (proof != null && proof.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    var fileName = proof.FileName;
+                    await proof.CopyToAsync(memoryStream);
+                    byte[] proofBytes = memoryStream.ToArray();
+
+                    var result = new Experience()
+                    {
+                        CompanyName = experience.CompanyName,
+                        StartDate = experience.StartDate,
+                        EndDate = experience.EndDate,
+                        proof = proofBytes,
+                        fileName = fileName,
+                        User = newUser
+                    };
+
+                    await applicationDbContext.Experience.AddAsync(result);
+                    await applicationDbContext.SaveChangesAsync();
+                }
+            }
+            return RedirectToAction("Home");
+        }
+     
         public IActionResult ViewImage(Guid academicDetailId)
         {
             var academicDetail = applicationDbContext.AcademicDetails.FirstOrDefault(ad => ad.Id == academicDetailId);
@@ -358,6 +409,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
             return View((object)textContent);
         }
+
 
 
 
