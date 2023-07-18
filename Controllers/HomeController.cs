@@ -64,6 +64,10 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                         await applicationDbContext.SaveChangesAsync();
                         sendOTPEmail(newUser.Email, "", otp, newUser.Role.ToString());
                     }
+                    else
+                    {
+                        sendOTPEmail(newUser.Email,"",newUser.OTP, newUser.Role.ToString());
+                    }
                     return RedirectToAction("Register");
                 }
                 else if (newUser.ProfilesetupCompleted == ProfileStatus.PENDING.ToString())
