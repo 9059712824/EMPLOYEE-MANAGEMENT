@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "View Image";
+}
+<h1>View Image</h1>
+@if (!string.IsNullOrEmpty(ViewBag.ImageDataUrl))
+{
+    <img src="@ViewBag.ImageDataUrl" alt="Proof" style="max-width: 100%; max-height: 100%;" />
+}
+else
+{
+    <span>No image available</span>
+}

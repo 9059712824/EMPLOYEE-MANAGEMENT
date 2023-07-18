@@ -233,7 +233,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             applicationDbContext.Users.Update(newUser);
             await applicationDbContext.SaveChangesAsync();
 
-            return RedirectToAction("Index");
+            return RedirectToAction("AddAcademicDetails");
         }
 
         public IActionResult AddAcademicDetails()
@@ -273,6 +273,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             {
                 using (var memoryStream = new MemoryStream())
                 {
+                    var fileName = proof.FileName;
                     await proof.CopyToAsync(memoryStream);
                     byte[] proofBytes = memoryStream.ToArray();
 
@@ -282,6 +283,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                         StartYear = Convert.ToInt32(academicDetail.StartYear),
                         EndYear = Convert.ToInt32(academicDetail.EndYear),
                         proof = proofBytes,
+                        fileName = fileName,
                         User = newUser
                     };
 
@@ -291,8 +293,53 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             }
 
             // Return a success response or redirect to another page
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("ViewAcademicDetails");
         }
+
+        public async Task<IActionResult> ViewAcademicDetails()
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            List<AcademicDetails> academicDetails = await applicationDbContext.AcademicDetails
+                .Where(ad => ad.UserId == Guid.Parse(userId))
+                .ToListAsync();
+
+            return View(academicDetails);
+        }
+
+        public IActionResult ViewImage(Guid academicDetailId)
+        {
+            var academicDetail = applicationDbContext.AcademicDetails.FirstOrDefault(ad => ad.Id == academicDetailId);
+            if (academicDetail == null || academicDetail.proof == null || academicDetail.proof.Length == 0)
+            {
+                return NotFound();
+            }
+
+            // Convert the byte array to a Base64-encoded string
+            var base64Image = Convert.ToBase64String(academicDetail.proof);
+            var imageDataUrl = $"data:image;base64,{base64Image}";
+
+            ViewBag.ImageDataUrl = imageDataUrl;
+            return View();
+        }
+
+        public IActionResult ViewText(Guid academicDetailId)
+        {
+            var academicDetail = applicationDbContext.AcademicDetails.FirstOrDefault(ad => ad.Id == academicDetailId);
+            if (academicDetail == null || academicDetail.proof == null || academicDetail.proof.Length == 0)
+            {
+                return NotFound();
+            }
+
+            string textContent = Encoding.UTF8.GetString(academicDetail.proof);
+
+            return View((object)textContent);
+        }
+
 
 
         public static string Encrypt(string password)

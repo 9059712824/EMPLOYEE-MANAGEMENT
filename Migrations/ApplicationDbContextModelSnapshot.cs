@@ -24,7 +24,8 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
 
             modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.AcademicDetails", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("EndYear")
@@ -37,11 +38,21 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
                     b.Property<int>("StartYear")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("fileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<byte[]>("proof")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("AcademicDetails");
                 });
@@ -67,14 +78,25 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
 
             modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.Experience", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("fileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("proof")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Experience");
                 });
@@ -117,7 +139,8 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
 
             modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.UserDetails", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
@@ -152,7 +175,13 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
                     b.Property<double>("Salary")
                         .HasColumnType("float");
 
-                    b.HasKey("UserId");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("UserDetails");
                 });

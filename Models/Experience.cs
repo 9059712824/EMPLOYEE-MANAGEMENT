@@ -6,6 +6,8 @@ namespace EMPLOYEE_MANAGEMENT.Models
 {
     public class Experience
     {
+        [Key]
+        public Guid Id { get; set; }
         [Required]
         public String CompanyName;
 
@@ -17,6 +19,9 @@ namespace EMPLOYEE_MANAGEMENT.Models
 
         [Required]
         public double YearsOfWorking;
+
+        [Required]
+        public String fileName { get; set; }
 
         [Required]
         public byte[] proof { get; set; }

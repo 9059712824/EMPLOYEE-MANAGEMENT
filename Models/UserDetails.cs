@@ -7,6 +7,9 @@ namespace EMPLOYEE_MANAGEMENT.Models
 {
     public class UserDetails
     {
+        [Key]
+        public Guid Id { get; set; }
+
         [DisplayName("FirstName: ")]
         [Required]
         public string FirstName { get; set; }

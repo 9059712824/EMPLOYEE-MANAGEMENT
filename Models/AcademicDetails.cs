@@ -6,6 +6,9 @@ namespace EMPLOYEE_MANAGEMENT.Models
 {
     public class AcademicDetails
     {
+        [Key]
+        public Guid Id { get; set; }
+
         [Required]
         public String Name { get; set; }
 
@@ -14,6 +17,9 @@ namespace EMPLOYEE_MANAGEMENT.Models
 
         [Required]
         public int EndYear { get; set; }
+
+        [Required]
+        public string fileName { get; set; }
 
         [Required]
         public byte[] proof { get; set; }

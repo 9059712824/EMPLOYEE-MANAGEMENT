@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMPLOYEE_MANAGEMENT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230714144813_UserDetails")]
-    partial class UserDetails
+    [Migration("20230717144021_create1")]
+    partial class create1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,11 +25,50 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.AcademicDetails", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("EndYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StartYear")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("fileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("proof")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("AcademicDetails");
+                });
+
             modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.Department", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DepartmentHead")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DepartmentName")
                         .IsRequired()
@@ -38,6 +77,31 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Departments");
+                });
+
+            modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.Experience", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("fileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("proof")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Experience");
                 });
 
             modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.User", b =>
@@ -78,7 +142,8 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
 
             modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.UserDetails", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
@@ -113,9 +178,37 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
                     b.Property<double>("Salary")
                         .HasColumnType("float");
 
-                    b.HasKey("UserId");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("UserDetails");
+                });
+
+            modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.AcademicDetails", b =>
+                {
+                    b.HasOne("EMPLOYEE_MANAGEMENT.Models.User", "User")
+                        .WithOne("AcademicDetails")
+                        .HasForeignKey("EMPLOYEE_MANAGEMENT.Models.AcademicDetails", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.Experience", b =>
+                {
+                    b.HasOne("EMPLOYEE_MANAGEMENT.Models.User", "User")
+                        .WithOne("Experience")
+                        .HasForeignKey("EMPLOYEE_MANAGEMENT.Models.Experience", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.UserDetails", b =>
@@ -131,6 +224,12 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
 
             modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.User", b =>
                 {
+                    b.Navigation("AcademicDetails")
+                        .IsRequired();
+
+                    b.Navigation("Experience")
+                        .IsRequired();
+
                     b.Navigation("UserDetails")
                         .IsRequired();
                 });

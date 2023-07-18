@@ -27,14 +27,14 @@ namespace EMPLOYEE_MANAGEMENT.DAL
                 .OnDelete(DeleteBehavior.Cascade); // Ensure cascaded deletion of UserDetails when User is deleted
 
             modelBuilder.Entity<UserDetails>()
-                .HasKey(up => up.UserId);
+                .HasKey(up => up.Id);
 
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
 
             modelBuilder.Entity<AcademicDetails>()
-                .HasKey(up => up.UserId);
+                .HasKey(up => up.Id);
 
             modelBuilder.Entity<AcademicDetails>()
                 .HasOne(ad => ad.User)
@@ -43,7 +43,7 @@ namespace EMPLOYEE_MANAGEMENT.DAL
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Experience>()
-                .HasKey(up => up.UserId);
+                .HasKey(up => up.Id);
 
             modelBuilder.Entity<Experience>()
                 .HasOne(ex => ex.User)

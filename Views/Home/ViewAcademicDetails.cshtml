@@ -1,0 +1,137 @@
+﻿@model List<EMPLOYEE_MANAGEMENT.Models.AcademicDetails>
+@{
+    ViewBag.Title = "View Academic Details";
+}
+<div id="academicContainer">
+    @if (Model != null)
+    {
+        for (int i = 0; i < Model.Count; i++)
+        {
+            <div class="academicEntry">
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Academic Name</label>
+                    <select class="form-control" name="academicDetails[@i].Name" required>
+                        <option value="">Select academic name</option>
+                        <option value="School" selected="@(Model[i].Name == "School")">School</option>
+                        <option value="Intermediate(10+2)" selected="@(Model[i].Name == "Intermediate(10+2)")">Intermediate(10+2)</option>
+                        <option value="Diploma" selected="@(Model[i].Name == "Diploma")">Diploma</option>
+                        <option value="BSC" selected="@(Model[i].Name == "BSC")">B.SC</option>
+                        <option value="BCA" selected="@(Model[i].Name == "BCA")">B.CA</option>
+                        <option value="BTech" selected="@(Model[i].Name == "BTech")">B.Tech</option>
+                        <option value="MTech" selected="@(Model[i].Name == "MTech")">M.Tech</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="StartYear" class="form-label">Start Year</label>
+                    <select class="form-control" name="academicDetails[@i].StartYear" required>
+                        <option value="">Select year</option>
+                        @for (int year = 2000; year <= DateTime.Now.Year; year++)
+                        {
+                            <option value="@year" selected="@(Model[i].StartYear == year)">@year</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="EndYear" class="form-label">End Year</label>
+                    <select class="form-control" name="academicDetails[@i].EndYear" required>
+                        <option value="">Select year</option>
+                        @for (int year = 2000; year <= DateTime.Now.Year; year++)
+                        {
+                            <option value="@year" selected="@(Model[i].EndYear == year)">@year</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="proof" class="form-label">Proof</label>
+                    <span>@Model[i].fileName</span>
+                    @if (Model[i].proof != null && Model[i].proof.Length > 0)
+                    {
+                        var fileName = Model[i].fileName;
+                        var fileExtension = System.IO.Path.GetExtension(fileName).ToLower();
+
+                        if (fileExtension == ".txt")
+                        {
+                            <a href="@Url.Action("ViewText", "Home", new { academicDetailId = Model[i].Id })" target="_blank">View Text File</a>
+                        }
+                        else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".gif")
+                        {
+                            <a href="@Url.Action("ViewImage", "Home", new { academicDetailId = Model[i].Id })" target="_blank">View Image</a>
+                        }
+                        else
+                        {
+                            <span>Invalid proof file</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>No proof available</span>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+<button type="submit" class="btn btn-primary">Submit</button>
+
+<script>
+    var startYearSelect = document.querySelectorAll("select[name='StartYear']");
+    var endYearSelect = document.querySelectorAll("select[name='EndYear']");
+    var currentYear = new Date().getFullYear();
+
+    // Populate the start year dropdowns
+    for (var i = 0; i < startYearSelect.length; i++) {
+        var startYearSelectElem = startYearSelect[i];
+        for (var year = 2000; year <= currentYear; year++) {
+            var option = document.createElement("option");
+            option.value = year;
+            option.text = year;
+            startYearSelectElem.appendChild(option);
+        }
+    }
+
+    // Update end year options based on start year selection
+    function updateEndYearOptions(startYearSelectElem, endYearSelectElem) {
+        var startYear = parseInt(startYearSelectElem.value);
+
+        var nameSelect = startYearSelectElem.parentNode.previousElementSibling.querySelector("select[name='Name']");
+        var selectedValue = nameSelect.value;
+
+        if (selectedValue === "School") {
+            startYear++;
+        } else if (selectedValue === "Intermediate(10+2)") {
+            startYear += 2;
+        } else if (selectedValue === "Diploma") {
+            startYear += 3;
+        } else if (selectedValue === "BSC") {
+            startYear += 3;
+        } else if (selectedValue === "BCA") {
+            startYear += 3;
+        } else if (selectedValue === "BTech") {
+            startYear += 4;
+        } else if (selectedValue === "MTech") {
+            startYear += 2;
+        }
+
+        endYearSelectElem.innerHTML = "";
+
+        // Generate options for end year based on start year selection
+        for (var year = startYear; year <= currentYear; year++) {
+            var option = document.createElement("option");
+            option.value = year;
+            option.text = year;
+            endYearSelectElem.appendChild(option);
+        }
+    }
+
+    // Event listener for start year select elements
+    for (var i = 0; i < startYearSelect.length; i++) {
+        var startYearSelectElem = startYearSelect[i];
+        var endYearSelectElem = endYearSelect[i];
+        startYearSelectElem.addEventListener("change", function () {
+            updateEndYearOptions(this, this.parentNode.nextElementSibling.querySelector("select[name='EndYear']"));
+        });
+    }
+</script>
