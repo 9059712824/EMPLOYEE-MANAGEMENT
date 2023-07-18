@@ -50,6 +50,20 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 if (newUser.ProfilesetupCompleted == ProfileStatus.INACTIVE.ToString())
                 {
                     HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
+
+                    if (TimeDifference(newUser.OTPGeneratedTime))
+                    {
+                        double otp = RandomNumber(100000, 999999);
+
+                        DateTime date = DateTime.Now;
+
+                        newUser.OTP = otp;
+                        newUser.OTPGeneratedTime=date;
+
+                        applicationDbContext.Users.Update(newUser);
+                        await applicationDbContext.SaveChangesAsync();
+                        sendOTPEmail(newUser.Email, "", otp, newUser.Role.ToString());
+                    }
                     return RedirectToAction("Register");
                 }
                 else if (newUser.ProfilesetupCompleted == ProfileStatus.PENDING.ToString())
