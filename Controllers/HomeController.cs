@@ -167,7 +167,32 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
             return View();
         }
-
+       /* public IActionResult ViewEmployeeDetails()
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Session value not found, handle accordingly
+                return RedirectToAction("Login");
+            }
+            return View();
+        }*/
+        [HttpGet]
+        public async Task<IActionResult> ViewUserDetails( )
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Session value not found, handle accordingly
+                return RedirectToAction("Login");
+            }
+            var userDetails = await applicationDbContext.UserDetails.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(userId));
+            if (userDetails == null)
+            {
+                throw new InvalidDataException("user details not found");
+            }
+            return View(userDetails);
+        }
         public IActionResult AddUserDetails()
         {
             var userId = HttpContext.Session.GetString("UserId");
