@@ -1,4 +1,4 @@
-﻿@model EMPLOYEE_MANAGEMENT.Models.Experience
+﻿@model EMPLOYEE_MANAGEMENT.DTO.ExperienceDTO
 @{
     ViewBag.Title = "Add Experience Details";
 }
@@ -19,11 +19,7 @@
             </div>
             <div class="mb-3">
                 <label for="YearsOfWorking" class="form-label">Years of Working</label>
-                <input type="number" name="YearsOfWorking" required>
-            </div>
-            <div class="mb-3">
-                <label for="Filename" class="form-label">Filename</label>
-                <input type="text" name="Filename" required>
+                <input type="number" name="YearsOfWorking" id="YearsOfWorking" required>
             </div>
             <div class="mb-3">
                 <label for="proof" class="form-label">Proof</label>
@@ -33,3 +29,19 @@
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+
+<script>
+    var startDateInput = document.querySelector("input[name='StartDate']");
+    var endDateInput = document.querySelector("input[name='EndDate']");
+    var yearsOfWorkingInput = document.querySelector("#YearsOfWorking");
+
+    startDateInput.addEventListener("change", calculateYearsOfWorking);
+    endDateInput.addEventListener("change", calculateYearsOfWorking);
+
+    function calculateYearsOfWorking() {
+        var startDate = new Date(startDateInput.value);
+        var endDate = new Date(endDateInput.value);
+        var yearsOfWorking = endDate.getFullYear() - startDate.getFullYear();
+        yearsOfWorkingInput.value = yearsOfWorking;
+    }
+</script>

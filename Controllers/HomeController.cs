@@ -340,14 +340,14 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> AddExperienceDetails(Experience experience,IFormFile proof)
+        public async Task<IActionResult> AddExperienceDetails(ExperienceDTO experience,IFormFile proof)
         {
             if(!ModelState.IsValid)
             {
                 return RedirectToAction("Login");
             }
             Guid userId=Guid.Parse(HttpContext.Session.GetString("UserId"));
-            var newUser=await applicationDbContext.Experience.FirstOrDefaultAsync(ad => ad.UserId == userId);
+            var newUser=await applicationDbContext.Users.FirstOrDefaultAsync(ad => ad.UserId == userId);
             if (newUser == null)
             {
                 throw new InvalidDataException(userId.ToString());
