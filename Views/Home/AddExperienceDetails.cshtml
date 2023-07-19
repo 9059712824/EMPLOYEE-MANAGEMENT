@@ -19,7 +19,7 @@
             </div>
             <div class="mb-3">
                 <label for="YearsOfWorking" class="form-label">Years of Working</label>
-                <input type="number" name="YearsOfWorking" id="YearsOfWorking" required>
+                <input type="text" name="YearsOfWorking" id="YearsOfWorking" disabled>
             </div>
             <div class="mb-3">
                 <label for="proof" class="form-label">Proof</label>
@@ -41,7 +41,26 @@
     function calculateYearsOfWorking() {
         var startDate = new Date(startDateInput.value);
         var endDate = new Date(endDateInput.value);
-        var yearsOfWorking = endDate.getFullYear() - startDate.getFullYear();
-        yearsOfWorkingInput.value = yearsOfWorking;
+
+        // Calculate the difference in years, months, and days
+        var yearsDiff = endDate.getFullYear() - startDate.getFullYear();
+        var monthsDiff = endDate.getMonth() - startDate.getMonth();
+        var daysDiff = endDate.getDate() - startDate.getDate();
+
+        // Adjust for negative values in months and days
+        if (daysDiff < 0) {
+            monthsDiff--;
+            var lastDayOfMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 0).getDate();
+            daysDiff += lastDayOfMonth;
+        }
+
+        if (monthsDiff < 0) {
+            yearsDiff--;
+            monthsDiff += 12;
+        }
+
+        // Update the input field with the calculated years, months, and days
+        yearsOfWorkingInput.value = yearsDiff + " Years, " + monthsDiff + " Months, " + daysDiff + " Days";
     }
 </script>
+

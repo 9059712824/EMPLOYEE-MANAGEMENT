@@ -28,6 +28,18 @@
                         
                     </ul>
                 </div>
+                <div class="d-flex justify-content-end">
+                    @if (Context.Session.GetString("UserId") == null)
+                    {
+                        <!-- Display the login button if the session is null -->
+                        <a href="@Url.Action("Login", "Home")" class="btn btn-primary btn-sm">Login</a>
+                    }
+                    else
+                    {
+                        <!-- Display the logout button if the session is not null -->
+                        <a href="@Url.Action("Logout", "Home")" class="btn btn-primary btn-sm">Logout</a>
+                    }
+                </div>
             </div>
         </nav>
     </header>

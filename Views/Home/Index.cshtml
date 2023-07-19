@@ -1,18 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<div>
-<!--<div style="width: 100%; position: absolute; top: 10px; right: 90px;">
-    <a href="@Url.Action("Login")" class="btn btn-primary btn-xs" style="float: right">
-     Login
-    </a>
-</div>-->
-<div style="width: 100%; position: absolute; top: 10px;right:30px; left:0;">
-    <a href="@Url.Action("Login")" class="btn btn-primary btn-xs" style="float: right">
-        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Login
-    </a>
-</div>
-</div>
+
 
 <a href="@Url.Action("ViewUserDetails")" class="btn btn-primary" style="background-color: green; color: white;">Add</a>
 <br />
@@ -21,7 +10,4 @@
 <br />
 <br />
 <a href="@Url.Action("ViewAcademicDetails")" class="btn btn-primary" style="background-color: orange; color: white;">Academic Details</a>
-<a href="@Url.Action("Add")" class="btn btn-primary">Add User</a>
-<a href="@Url.Action("ViewUserDetails")" class="btn btn-primary">Details</a>
-<a href="@Url.Action("ViewAcademicDetails")" class="btn btn-primary">Academic Details</a>
 <a href="@Url.Action("AddExperienceDetails")" class="btn btn-primary">Add Experirence Details</a>

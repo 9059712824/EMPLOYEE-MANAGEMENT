@@ -410,6 +410,11 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return View((object)textContent);
         }
 
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
+        }
 
 
 
