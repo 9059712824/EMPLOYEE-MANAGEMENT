@@ -47,7 +47,7 @@
     </div>
     <a href="@Url.Content("~/Home")" button type="submit" class="btn btn-primary">Back</a>
 
-<script>
+<!--<script>
     function calculateAge() {
         var dobInput = document.getElementById('DOB').value;
         var dob = new Date(dobInput);
@@ -64,12 +64,39 @@
 
         document.getElementById('Age').value = age;
     }
-</script>
+</script>-->
 <script>
     $(document).ready(function () {
         $('.no-highlight').on('mousedown', function (e) {
             e.preventDefault();
         });
     });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.no-highlight').on('mousedown', function (e) {
+            e.preventDefault();
+        });
+
+        $('#DOB').on('change', function () {
+            calculateAge();
+        });
+    });
+
+    function calculateAge() {
+        var dobInput = $('#DOB').val();
+        var dob = new Date(dobInput);
+        var currentDate = new Date();
+
+        var age = currentDate.getFullYear() - dob.getFullYear();
+
+        if (currentDate.getMonth() < dob.getMonth()) {
+            age--;
+        } else if (currentDate.getMonth() === dob.getMonth() && currentDate.getDate() < dob.getDate()) {
+            age--;
+        }
+
+        $('#Age').val(age);
+    }
 </script>
 
