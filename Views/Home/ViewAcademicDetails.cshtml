@@ -61,11 +61,11 @@
 
                         if (fileExtension == ".txt")
                         {
-                            <a href="@Url.Action("ViewText", "Home", new { academicDetailId = Model[i].Id })" target="_blank">View Text File</a>
+                            <a href="@Url.Action("ViewText", "Home", new { detailsId = Model[i].Id })" target="_blank">View Text File</a>
                         }
                         else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".gif")
                         {
-                            <a href="@Url.Action("ViewImage", "Home", new { academicDetailId = Model[i].Id })" target="_blank">View Image</a>
+                            <a href="@Url.Action("ViewImage", "Home", new { detailsId = Model[i].Id })" target="_blank">View Image</a>
                         }
                         else
                         {
@@ -85,63 +85,3 @@
 {
     <a href="@Url.Content("~/Home")" button type="submit" class="btn btn-primary">Back</a>
 }
-
-<script>
-    var startYearSelect = document.querySelectorAll("select[name='StartYear']");
-    var endYearSelect = document.querySelectorAll("select[name='EndYear']");
-    var currentYear = new Date().getFullYear();
-
-    // Populate the start year dropdowns
-    for (var i = 0; i < startYearSelect.length; i++) {
-        var startYearSelectElem = startYearSelect[i];
-        for (var year = 2000; year <= currentYear; year++) {
-            var option = document.createElement("option");
-            option.value = year;
-            option.text = year;
-            startYearSelectElem.appendChild(option);
-        }
-    }
-
-    // Update end year options based on start year selection
-    function updateEndYearOptions(startYearSelectElem, endYearSelectElem) {
-        var startYear = parseInt(startYearSelectElem.value);
-
-        var nameSelect = startYearSelectElem.parentNode.previousElementSibling.querySelector("select[name='Name']");
-        var selectedValue = nameSelect.value;
-
-        if (selectedValue === "School") {
-            startYear++;
-        } else if (selectedValue === "Intermediate(10+2)") {
-            startYear += 2;
-        } else if (selectedValue === "Diploma") {
-            startYear += 3;
-        } else if (selectedValue === "BSC") {
-            startYear += 3;
-        } else if (selectedValue === "BCA") {
-            startYear += 3;
-        } else if (selectedValue === "BTech") {
-            startYear += 4;
-        } else if (selectedValue === "MTech") {
-            startYear += 2;
-        }
-
-        endYearSelectElem.innerHTML = "";
-
-        // Generate options for end year based on start year selection
-        for (var year = startYear; year <= currentYear; year++) {
-            var option = document.createElement("option");
-            option.value = year;
-            option.text = year;
-            endYearSelectElem.appendChild(option);
-        }
-    }
-
-    // Event listener for start year select elements
-    for (var i = 0; i < startYearSelect.length; i++) {
-        var startYearSelectElem = startYearSelect[i];
-        var endYearSelectElem = endYearSelect[i];
-        startYearSelectElem.addEventListener("change", function () {
-            updateEndYearOptions(this, this.parentNode.nextElementSibling.querySelector("select[name='EndYear']"));
-        });
-    }
-</script>

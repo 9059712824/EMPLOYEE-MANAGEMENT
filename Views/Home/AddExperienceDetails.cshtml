@@ -7,19 +7,19 @@
         <div class="academicEntry">
             <div class="mb-3">
                 <label for="CompanyName" class="form-label">Company Name</label>
-                <input type="text" name="CompanyName" required>
+                <input type="text" class="form-control" name="CompanyName" asp-for="CompanyName" required>
             </div>
             <div class="mb-3">
                 <label for="StartDate" class="form-label">Start Date</label>
-                <input type="date" name="StartDate" required>
+                <input type="date" class="form-control" name="StartDate" asp-for="StartDate" required>
             </div>
             <div class="mb-3">
                 <label for="EndDate" class="form-label">End Date</label>
-                <input type="date" name="EndDate" required>
+                <input type="date" class="form-control" name="EndDate" asp-for="EndDate" required>
             </div>
             <div class="mb-3">
                 <label for="YearsOfWorking" class="form-label">Years of Working</label>
-                <input type="text" name="YearsOfWorking" id="YearsOfWorking" disabled>
+                <input type="text" class="form-control" name="YearsOfWorking" id="YearsOfWorking" asp-for="YearsOfWorking" readonly>
             </div>
             <div class="mb-3">
                 <label for="proof" class="form-label">Proof</label>

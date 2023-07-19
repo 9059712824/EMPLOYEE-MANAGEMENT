@@ -1,0 +1,69 @@
+﻿@model List<EMPLOYEE_MANAGEMENT.DTO.ViewUserDetails>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Employees</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Employee Details</h1>
+
+    @if (Model.Count == 0)
+    {
+        <p>No employees found.</p>
+    }
+    else
+    {
+        <table>
+            <tr>
+                <th>Email</th>
+                <th>Role</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Employee Number</th>
+                <th>Gender</th>
+                <th>DOB</th>
+                <th>Age</th>
+                <th>Address</th>
+                <th>Department</th>
+                <th>Salary</th>
+                <th>Actions</th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Email</td>
+                    <td>@item.Role</td>
+                    <td>@item.FirstName</td>
+                    <td>@item.LastName</td>
+                    <td>@item.EmployeeNumber</td>
+                    <td>@item.Gender</td>
+                    <td>@item.DOB.ToLongDateString()</td>
+                    <td>@item.Age</td>
+                    <td>@item.Address</td>
+                    <td>@item.Department</td>
+                    <td>@item.Salary</td>
+                    <td>
+                        <a href="" class="btn btn-primary">Update</a>
+                        <a href="" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+    <a href="@Url.Content("~/Home")" button type="submit" class="btn btn-primary">Back</a>
+</body>
+</html>

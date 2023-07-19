@@ -9,16 +9,20 @@ namespace EMPLOYEE_MANAGEMENT.Models
         [Key]
         public Guid Id { get; set; }
         [Required]
-        public String CompanyName;
+        public String CompanyName { get; set; }
 
         [Required]
-        public DateTime StartDate;
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime StartDate { get; set; }
 
         [Required]
-        public DateTime EndDate;
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime EndDate { get; set; }
 
         [Required]
-        public double YearsOfWorking;
+        public String YearsOfWorking { get; set; }
 
         [Required]
         public String fileName { get; set; }

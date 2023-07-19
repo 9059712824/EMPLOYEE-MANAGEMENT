@@ -45,12 +45,12 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             {
                 throw new InvalidDataException("user");
             }
+            HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
+            HttpContext.Session.SetString("Role", newUser.Role.ToString());
             if (newUser.Email == user.Email && VerifyPassword(user.Password, newUser.Password))
             {
                 if (newUser.ProfilesetupCompleted == ProfileStatus.INACTIVE.ToString())
                 {
-                    HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
-
                     if (TimeDifference(newUser.OTPGeneratedTime))
                     {
                         double otp = RandomNumber(100000, 999999);
@@ -72,23 +72,15 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 }
                 else if (newUser.ProfilesetupCompleted == ProfileStatus.PENDING.ToString())
                 {
-                    HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
                     return RedirectToAction("AddUserDetails");
                 }
-                if (newUser.Role == Role.ADMIN.ToString())
+                if (newUser.Role == Role.ADMIN.ToString() || newUser.Role == Role.DEPARTMENT_HEAD.ToString())
                 {
-                    HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
                     return RedirectToAction("Add");
                 }
-                else if (newUser.Role == Role.DEPARTMENT_HEAD.ToString())
+                if(newUser.Role == Role.EMPLOYEE.ToString())
                 {
-                    HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
-                    HttpContext.Session.SetString("Role", newUser.Role.ToString());
-                    return RedirectToAction("Add");
-                }
-                else
-                {
-                    return RedirectToAction();
+                    return RedirectToAction("Index");
                 }
             }
             return RedirectToAction("Add");
@@ -310,7 +302,6 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return RedirectToAction("ViewAcademicDetails");
         }
 
-
         public async Task<IActionResult> ViewAcademicDetails()
         {
             var userId = HttpContext.Session.GetString("UserId");
@@ -330,6 +321,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
             return View(academicDetails);
         }
+
         public IActionResult AddExperienceDetails()
         {
             var userId=HttpContext.Session.GetString("UserId");
@@ -337,8 +329,8 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 return RedirectToAction("Login");
             }
             return View();
-
         }
+
         [HttpPost]
         public async Task<IActionResult> AddExperienceDetails(ExperienceDTO experience,IFormFile proof)
         {
@@ -346,8 +338,11 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             {
                 return RedirectToAction("Login");
             }
+
             Guid userId=Guid.Parse(HttpContext.Session.GetString("UserId"));
+
             var newUser=await applicationDbContext.Users.FirstOrDefaultAsync(ad => ad.UserId == userId);
+
             if (newUser == null)
             {
                 throw new InvalidDataException(userId.ToString());
@@ -363,51 +358,164 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                     var fileName = proof.FileName;
                     await proof.CopyToAsync(memoryStream);
                     byte[] proofBytes = memoryStream.ToArray();
-
-                    var result = new Experience()
+                    Experience result = new Experience()
                     {
                         CompanyName = experience.CompanyName,
                         StartDate = experience.StartDate,
                         EndDate = experience.EndDate,
+                        YearsOfWorking = experience.YearsOfWorking,
                         proof = proofBytes,
                         fileName = fileName,
                         User = newUser
                     };
-
                     await applicationDbContext.Experience.AddAsync(result);
                     await applicationDbContext.SaveChangesAsync();
                 }
             }
-            return RedirectToAction("Home");
+            return RedirectToAction("Index");
         }
-     
-        public IActionResult ViewImage(Guid academicDetailId)
+
+        public async Task<IActionResult> ViewExperienceDetails()
         {
-            var academicDetail = applicationDbContext.AcademicDetails.FirstOrDefault(ad => ad.Id == academicDetailId);
-            if (academicDetail == null || academicDetail.proof == null || academicDetail.proof.Length == 0)
+            var userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            List<Experience> experience = await applicationDbContext.Experience
+                .Where(ad => ad.UserId == Guid.Parse(userId))
+                .ToListAsync();
+
+            if (experience == null)
+            {
+                return RedirectToAction("AddAcademicDetails");
+            }
+
+            return View(experience);
+        }
+
+        public IActionResult ViewImage(Guid detailsId)
+        {
+            var base64Image = "";
+            var academicDetail = applicationDbContext.AcademicDetails.FirstOrDefault(ad => ad.Id == detailsId);
+            var experience = applicationDbContext.Experience.FirstOrDefault(ad => ad.Id == detailsId);
+
+            if (academicDetail != null && academicDetail.proof != null && academicDetail.proof.Length > 0)
+            {
+                base64Image = Convert.ToBase64String(academicDetail.proof);
+            }
+            else if (experience != null && experience.proof != null && experience.proof.Length > 0)
+            {
+                base64Image = Convert.ToBase64String(experience.proof);
+            }
+            else
             {
                 return NotFound();
             }
 
             // Convert the byte array to a Base64-encoded string
-            var base64Image = Convert.ToBase64String(academicDetail.proof);
             var imageDataUrl = $"data:image;base64,{base64Image}";
 
             ViewBag.ImageDataUrl = imageDataUrl;
             return View();
         }
 
-        public IActionResult ViewText(Guid academicDetailId)
+
+        public IActionResult ViewText(Guid detailsId)
         {
-            var academicDetail = applicationDbContext.AcademicDetails.FirstOrDefault(ad => ad.Id == academicDetailId);
-            if (academicDetail == null || academicDetail.proof == null || academicDetail.proof.Length == 0)
+            String textContent = "";
+            var academicDetail = applicationDbContext.AcademicDetails.FirstOrDefault(ad => ad.Id == detailsId);
+            var experience = applicationDbContext.Experience.FirstOrDefault(ad => ad.Id == detailsId);
+
+            if (academicDetail == null && experience == null)
             {
                 return NotFound();
             }
 
-            string textContent = Encoding.UTF8.GetString(academicDetail.proof);
+            if (academicDetail != null && academicDetail.proof != null && academicDetail.proof.Length > 0)
+            {
+                textContent = Encoding.UTF8.GetString(academicDetail.proof);
+            }
+            else if (experience != null && experience.proof != null && experience.proof.Length > 0)
+            {
+                textContent = Encoding.UTF8.GetString(experience.proof);
+            }
+            else
+            {
+                return NotFound();
+            }
 
             return View((object)textContent);
+        }
+
+        public async Task<IActionResult> ViewEmployeesDetails()
+        {
+            string userId = HttpContext.Session.GetString("UserId");
+            string role = HttpContext.Session.GetString("Role");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            Guid Id = Guid.Parse(userId);
+            List<ViewUserDetails> details;
+            if (role == Role.ADMIN.ToString())
+            {
+                details = await applicationDbContext.Users
+                    .Join(
+                applicationDbContext.UserDetails,
+                users => users.UserId,
+                userDetails => userDetails.UserId,
+                (users, userDetails) => new ViewUserDetails
+                {
+                    UserId = users.UserId,
+                    Email = users.Email,
+                    Role = users.Role,
+                    FirstName = userDetails.FirstName,
+                    LastName = userDetails.LastName,
+                    EmployeeNumber = userDetails.Number,
+                    Gender = userDetails.Gender,
+                    DOB = userDetails.DOB,
+                    Age = userDetails.Age,
+                    Address = userDetails.Address,
+                    Department = userDetails.Department,
+                    Salary = userDetails.Salary
+                })
+                    .Where(users => users.Role == Role.EMPLOYEE.ToString() || users.Role == Role.DEPARTMENT_HEAD.ToString())
+                    .ToListAsync();
+            }
+            else if (role == Role.DEPARTMENT_HEAD.ToString())
+            {
+                details = await applicationDbContext.Users
+                    .Join(
+                applicationDbContext.UserDetails,
+                users => users.UserId,
+                userDetails => userDetails.UserId,
+                (users, userDetails) => new ViewUserDetails
+                {
+                    UserId = users.UserId,
+                    Email = users.Email,
+                    Role = users.Role,
+                    FirstName = userDetails.FirstName,
+                    LastName = userDetails.LastName,
+                    EmployeeNumber = userDetails.Number,
+                    Gender = userDetails.Gender,
+                    DOB = userDetails.DOB,
+                    Age = userDetails.Age,
+                    Address = userDetails.Address,
+                    Department = userDetails.Department,
+                    Salary = userDetails.Salary
+                })
+                    .Where(users => users.Role == Role.EMPLOYEE.ToString())
+                    .ToListAsync();
+            }
+            else
+            {
+                details = new List<ViewUserDetails>();
+            }
+
+            return View(details);
         }
 
         public IActionResult Logout()
@@ -415,8 +523,6 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
-
-
 
         public static string Encrypt(string password)
         {
@@ -516,6 +622,8 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
         public IActionResult Index()
         {
+            String role = HttpContext.Session.GetString("Role");
+            ViewBag.role = role;
             return View();
         }
 

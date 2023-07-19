@@ -4,12 +4,16 @@ namespace EMPLOYEE_MANAGEMENT.DTO
 {
     public class ExperienceDTO
     {
-        public String CompanyName;
+        public String CompanyName { get; set; }
 
-        public DateTime StartDate;
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime StartDate { get; set; }
 
-        public DateTime EndDate;
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime EndDate { get; set; }
 
-        public double YearsOfWorking;
+        public String YearsOfWorking { get; set; }
     }
 }

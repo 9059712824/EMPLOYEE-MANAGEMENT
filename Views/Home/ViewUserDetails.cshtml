@@ -25,9 +25,10 @@
             <option value="Female">Female</option>
         </select>
     </div>
+
     <div class="mb-3">
         <label for="DOB" class="form-label">DOB</label>
-    <input type="date" class="form-control no-highlight" id="DOB" asp-for="DOB" onchange="calculateAge()" required disabled>
+    <input type="text" class="form-control no-highlight" id="DOB" asp-for="DOB" onchange="calculateAge()" required disabled>
     </div>
     <div class="mb-3">
         <label for="Age" class="form-label">Age</label>
@@ -46,25 +47,6 @@
     <input type="text" class="form-control no-highlight" id="Department" asp-for="Department" required disabled>
     </div>
     <a href="@Url.Content("~/Home")" button type="submit" class="btn btn-primary">Back</a>
-
-<!--<script>
-    function calculateAge() {
-        var dobInput = document.getElementById('DOB').value;
-        var dob = new Date(dobInput);
-        var currentDate = new Date();
-
-        var age = currentDate.getFullYear() - dob.getFullYear();
-
-        if (currentDate.getMonth() < dob.getMonth()) {
-            age--;
-        }
-        else if (currentDate.getMonth() === dob.getMonth() && currentDate.getDate() < dob.getDate()) {
-            age--;
-        }
-
-        document.getElementById('Age').value = age;
-    }
-</script>-->
 <script>
     $(document).ready(function () {
         $('.no-highlight').on('mousedown', function (e) {
@@ -74,7 +56,7 @@
 </script>
 <script>
     $(document).ready(function () {
-        $('.no-highlight').on('mousedown', function (e) {
+        $('.no-highlight').on('mousedown', function (e)) {
             e.preventDefault();
         });
 
@@ -99,4 +81,3 @@
         $('#Age').val(age);
     }
 </script>
-

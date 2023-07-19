@@ -3,11 +3,11 @@
 }
 
 
-<a href="@Url.Action("ViewUserDetails")" class="btn btn-primary" style="background-color: green; color: white;">Add</a>
-<br />
-<br />
-<a href="@Url.Action("ViewUserDetails")" class="btn btn-primary" style="background-color: blue; color: white;">Details</a>
-<br />
-<br />
+<a href="@Url.Action("ViewUserDetails")" class="btn btn-primary" style="background-color: green; color: white;">Add User</a>
+<a href="@Url.Action("ViewUserDetails")" class="btn btn-primary" style="background-color: blue; color: white;">View Details</a>
 <a href="@Url.Action("ViewAcademicDetails")" class="btn btn-primary" style="background-color: orange; color: white;">Academic Details</a>
-<a href="@Url.Action("AddExperienceDetails")" class="btn btn-primary">Add Experirence Details</a>
+<a href="@Url.Action("ViewExperienceDetails")" class="btn btn-primary" style="background-color: yellow; color: white;">View Experirence Details</a>
+@if (Context.Session.GetString("Role") == "ADMIN" || Context.Session.GetString("Role") == "DEPARTMENT_HEAD")
+{
+    <a href="@Url.Action("ViewEmployeesDetails")" class="btn btn-primary" style="background-color: pink; color: white;">View Employees Details</a>
+}
