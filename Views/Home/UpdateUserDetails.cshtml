@@ -1,0 +1,76 @@
+﻿@model EMPLOYEE_MANAGEMENT.DTO.ViewUserDetails
+@{
+    ViewBag.Title = "View Users Details";
+}
+<form method="post" action="UpdateUserDetails" class="mt-5" enctype="multipart/form-data">
+    <div id="academicContainer">
+        <div class="academicEntry">
+            <div class="mb-3">
+                <input type="hidden" class="form-control" name="UserId" asp-for="UserId" required>
+            </div>
+            <div class="mb-3">
+                <label for="Email" class="form-label">Email</label>
+                <input type="email" class="form-control" name="Email" asp-for="Email" required readonly>
+            </div>
+            <div class="mb-3">
+                <label for="Role" class="form-label">Role</label>
+                <input type="text" class="form-control" name="Role" asp-for="Role" required>
+            </div>
+            <div class="mb-3">
+                <label for="FirstName" class="form-label">First Name</label>
+                <input type="text" class="form-control" name="FirstName" asp-for="FirstName" required>
+            </div>
+            <div class="mb-3">
+                <label for="LastName" class="form-label">Last Name</label>
+                <input type="text" class="form-control" name="LastName" asp-for="LastName" required>
+            </div>
+            <div class="mb-3">
+                <label for="EmployeeNumber" class="form-label">Employee Number</label>
+                <input type="number" class="form-control" name="EmployeeNumber" asp-for="EmployeeNumber" required readonly>
+            </div>
+            <div class="mb-3">
+                <label for="Gender" class="form-label">Gender</label>
+                <input type="text" class="form-control" name="Gender" asp-for="Gender" required>
+            </div>
+            <div class="mb-3">
+                <label for="DOB" class="form-label">DOB</label>
+                <input type="text" id="dateOfBirthInput" name="DOB" class="form-control" value="@Model.DOB" onfocus="(this.type='date')" onblur="(this.type='text')" onchange="calculateAge()" />
+            </div>
+            <div class="mb-3">
+                <label for="Age" class="form-label">Age</label>
+                <input type="number" class="form-control" id="Age" name="Age" asp-for="Age" required>
+            </div>
+            <div class="mb-3">
+                <label for="Address" class="form-label">Address</label>
+                <input type="text" class="form-control" name="Address" asp-for="Address" required>
+            </div>
+            <div class="mb-3">
+                <label for="Departmeent" class="form-label">Department</label>
+                <input type="text" class="form-control" name="Department" asp-for="Department" required>
+            </div>
+            <div class="mb-3">
+                <label for="Salary" class="form-label">Salary</label>
+                <input type="number" class="form-control" name="Salary" id="Salary" asp-for="Salary" required>
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<script>
+    function calculateAge() {
+        var dobInput = document.getElementById('dateOfBirthInput').value;
+        var dob = new Date(dobInput);
+        var currentDate = new Date();
+
+        var age = currentDate.getFullYear() - dob.getFullYear();
+
+        if (currentDate.getMonth() < dob.getMonth()) {
+            age--;
+        }
+        else if (currentDate.getMonth() === dob.getMonth() && currentDate.getDate() < dob.getDate()) {
+            age--;
+        }
+
+        document.getElementById('Age').value = age;
+    }
+</script>

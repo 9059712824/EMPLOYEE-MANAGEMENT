@@ -16,6 +16,41 @@
             text-align: left;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Are you sure about deleting this employee?',
+            //text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '@Url.Action("DeleteUserDetails", "Home")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        // Handle success response
+                        Swal.fire('Deleted!', 'The Users has been deleted.', 'success').then(() => {
+                            // Redirect to a new page or perform any other action
+                            window.location.href = '@Url.Action("ViewEmployeesDetails", "Home")';
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error response
+                        Swal.fire('Error!', 'An error occurred while deleting the employee.', 'error');
+                    }
+                });
+            }
+        });
+    }
+    </script>
 </head>
 <body>
     <h1>Employee Details</h1>
@@ -57,8 +92,9 @@
                     <td>@item.Department</td>
                     <td>@item.Salary</td>
                     <td>
-                        <a href="" class="btn btn-primary">Update</a>
-                        <a href="" class="btn btn-danger">Delete</a>
+                        <a href="@Url.Action("UpdateUserDetails", new { id = item.UserId })" class="btn btn-primary">Update</a>
+                        <a href="#" onclick="confirmDelete('@item.UserId')" class="btn btn-danger">Delete
+                        </a>
                     </td>
                 </tr>
             }

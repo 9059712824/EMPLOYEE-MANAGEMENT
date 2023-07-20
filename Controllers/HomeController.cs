@@ -236,6 +236,93 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return RedirectToAction("AddAcademicDetails");
         }
 
+        public async Task<IActionResult> UpdateUserDetails(Guid id)
+        {
+            String userId = HttpContext.Session.GetString("UserId");
+
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var details = await applicationDbContext.Users
+                .Where(user => user.UserId == id)
+                .Join(
+                    applicationDbContext.UserDetails,
+                    users => users.UserId,
+                    userDetails => userDetails.UserId,
+                    (users, userDetails) => new ViewUserDetails
+                    {
+                        UserId = users.UserId,
+                        Email = users.Email,
+                        Role = users.Role,
+                        FirstName = userDetails.FirstName,
+                        LastName = userDetails.LastName,
+                        EmployeeNumber = userDetails.Number,
+                        Gender = userDetails.Gender,
+                        DOB = userDetails.DOB,
+                        Age = userDetails.Age,
+                        Address = userDetails.Address,
+                        Department = userDetails.Department,
+                        Salary = userDetails.Salary
+                    })
+                .FirstOrDefaultAsync();
+
+            return View(details); // You should pass the 'details' object to the View to render the data.
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateUserDetails(ViewUserDetails viewUserDetails)
+        {
+            String userId = HttpContext.Session.GetString("UserId");
+            var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == viewUserDetails.UserId);
+            var newUserDetails = await applicationDbContext.UserDetails.FirstOrDefaultAsync(u =>u.UserId == viewUserDetails.UserId);
+            if(viewUserDetails == null)
+            {
+                return RedirectToAction("ViewEmployeesDetails");
+            }
+            if(newUser.Role != viewUserDetails.Role)
+            {
+                if(viewUserDetails.Role.ToLower() == Role.DEPARTMENT_HEAD.ToString().ToLower())
+                {
+                    newUser.Role = Role.DEPARTMENT_HEAD.ToString();
+                }
+                else if (viewUserDetails.Role.ToLower() == Role.EMPLOYEE.ToString().ToLower())
+                {
+                    newUser.Role = Role.EMPLOYEE.ToString();
+                }
+            }
+            newUserDetails.FirstName = viewUserDetails.FirstName;
+            newUserDetails.LastName = viewUserDetails.LastName;
+            newUserDetails.Gender = viewUserDetails.Gender;
+            newUserDetails.DOB = viewUserDetails.DOB;
+            newUserDetails.Age = viewUserDetails.Age;
+            newUserDetails.Address = viewUserDetails.Address;
+            newUserDetails.Department= viewUserDetails.Department;
+            newUserDetails.Salary = viewUserDetails.Salary;
+
+            applicationDbContext.Users.Update(newUser);
+            applicationDbContext.UserDetails.Update(newUserDetails);
+            await applicationDbContext.SaveChangesAsync();
+
+            return RedirectToAction("ViewEmployeesDetails");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUserDetails(Guid id)
+        {
+            var user = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            applicationDbContext.Users.Remove(user);
+            await applicationDbContext.SaveChangesAsync();
+            return Ok();
+        }
+
         public IActionResult AddAcademicDetails()
         {
             var userId = HttpContext.Session.GetString("UserId");
