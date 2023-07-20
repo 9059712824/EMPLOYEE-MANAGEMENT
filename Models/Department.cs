@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EMPLOYEE_MANAGEMENT.Models
 {
@@ -13,8 +14,10 @@ namespace EMPLOYEE_MANAGEMENT.Models
         [DisplayName("Department Name: ")]
         public String DepartmentName { get; set; }
 
-        [Required]
-        [DisplayName("Department Head")]
-        public String DepartmentHead { get; set;}
+        [DisplayName("DepartmentHead: ")]
+        [ForeignKey("User")]
+        public Guid DepartmentHead { get; set; }
+
+        public User User { get; set; }
     }
 }

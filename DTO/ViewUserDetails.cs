@@ -20,6 +20,8 @@ namespace EMPLOYEE_MANAGEMENT.DTO
         public int Age { get; set; }
         public String Address { get; set; }
         public String Department { get; set; }
+
+        public Guid DepartmentHead { get; set; }
         public double Salary { get; set; }
     }
 }

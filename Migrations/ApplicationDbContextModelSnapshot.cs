@@ -63,15 +63,16 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("DepartmentHead")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("DepartmentHead")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("DepartmentName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DepartmentHead");
 
                     b.ToTable("Departments");
                 });
@@ -171,6 +172,9 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("DepartmentHead")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -205,6 +209,17 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
                     b.HasOne("EMPLOYEE_MANAGEMENT.Models.User", "User")
                         .WithOne("AcademicDetails")
                         .HasForeignKey("EMPLOYEE_MANAGEMENT.Models.AcademicDetails", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.Department", b =>
+                {
+                    b.HasOne("EMPLOYEE_MANAGEMENT.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("DepartmentHead")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

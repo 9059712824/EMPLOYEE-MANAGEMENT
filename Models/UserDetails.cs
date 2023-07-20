@@ -44,6 +44,10 @@ namespace EMPLOYEE_MANAGEMENT.Models
         [Required]
         public string Department { get; set; }
 
+        [DisplayName("DepartmentHead: ")]
+        [Required]
+        public Guid DepartmentHead { get; set; }
+
         [DisplayName("Salary: ")]
         [Required]
         public double Salary { get; set; }

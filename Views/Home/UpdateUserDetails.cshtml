@@ -38,7 +38,7 @@
             </div>
             <div class="mb-3">
                 <label for="Age" class="form-label">Age</label>
-                <input type="number" class="form-control" id="Age" name="Age" asp-for="Age" required>
+                <input type="number" class="form-control" id="Age" name="Age" asp-for="Age" required readonly>
             </div>
             <div class="mb-3">
                 <label for="Address" class="form-label">Address</label>
@@ -47,6 +47,9 @@
             <div class="mb-3">
                 <label for="Departmeent" class="form-label">Department</label>
                 <input type="text" class="form-control" name="Department" asp-for="Department" required>
+            </div>
+            <div class="mb-3">
+                <input type="hidden" class="form-control" name="DepartmentHead" asp-for="DepartmentHead" required>
             </div>
             <div class="mb-3">
                 <label for="Salary" class="form-label">Salary</label>

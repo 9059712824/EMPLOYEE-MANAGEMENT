@@ -226,6 +226,19 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 Salary = userDetails.Salary,
                 User = newUser,
             };
+            var departments = await applicationDbContext.Departments.ToListAsync();
+            foreach (var i in departments)
+            {
+                if (i.DepartmentName.ToLower() == userDetails.Department.ToLower())
+                {
+                    NewUserDetails.DepartmentHead = i.DepartmentHead;
+                    NewUserDetails.Department = i.DepartmentName;
+                }
+            }
+            if (NewUserDetails.DepartmentHead == Guid.Empty)
+            {
+                return NotFound("Invalid Department");
+            }
             await applicationDbContext.UserDetails.AddAsync(NewUserDetails);
             await applicationDbContext.SaveChangesAsync();
 
@@ -235,6 +248,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
             return RedirectToAction("AddAcademicDetails");
         }
+
 
         public async Task<IActionResult> UpdateUserDetails(Guid id)
         {
@@ -264,6 +278,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                         Age = userDetails.Age,
                         Address = userDetails.Address,
                         Department = userDetails.Department,
+                        DepartmentHead = userDetails.DepartmentHead,
                         Salary = userDetails.Salary
                     })
                 .FirstOrDefaultAsync();
@@ -299,6 +314,15 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             newUserDetails.Age = viewUserDetails.Age;
             newUserDetails.Address = viewUserDetails.Address;
             newUserDetails.Department= viewUserDetails.Department;
+            var departments = await applicationDbContext.Departments.ToListAsync();
+            foreach (var i in departments)
+            {
+                if (i.DepartmentName.ToLower() == viewUserDetails.Department.ToLower())
+                {
+                    newUserDetails.DepartmentHead = i.DepartmentHead;
+                    newUserDetails.Department = i.DepartmentName;
+                }
+            }
             newUserDetails.Salary = viewUserDetails.Salary;
 
             applicationDbContext.Users.Update(newUser);
@@ -567,6 +591,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                     Age = userDetails.Age,
                     Address = userDetails.Address,
                     Department = userDetails.Department,
+                    DepartmentHead= userDetails.DepartmentHead,
                     Salary = userDetails.Salary
                 })
                     .Where(users => users.Role == Role.EMPLOYEE.ToString() || users.Role == Role.DEPARTMENT_HEAD.ToString())
@@ -592,6 +617,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                     Age = userDetails.Age,
                     Address = userDetails.Address,
                     Department = userDetails.Department,
+                    DepartmentHead = userDetails.DepartmentHead,
                     Salary = userDetails.Salary
                 })
                     .Where(users => users.Role == Role.EMPLOYEE.ToString())
