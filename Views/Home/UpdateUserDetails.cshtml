@@ -58,14 +58,13 @@
         </div>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
-    <a href="@Url.Action("ViewEmployeesDetails") button type="submit" class="btn btn-primary">Back</a>
+    <a href="@Url.Action("ViewEmployeesDetails")" class="btn btn-primary">Back</a>
 </form>
 <script>
     function calculateAge() {
         var dobInput = document.getElementById('dateOfBirthInput').value;
         var dob = new Date(dobInput);
         var currentDate = new Date();
-
         var age = currentDate.getFullYear() - dob.getFullYear();
 
         if (currentDate.getMonth() < dob.getMonth()) {
@@ -74,7 +73,6 @@
         else if (currentDate.getMonth() === dob.getMonth() && currentDate.getDate() < dob.getDate()) {
             age--;
         }
-
         document.getElementById('Age').value = age;
     }
 </script>

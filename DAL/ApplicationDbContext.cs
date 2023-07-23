@@ -18,6 +18,8 @@ namespace EMPLOYEE_MANAGEMENT.DAL
 
         public DbSet<Experience> Experience { get; set; }
 
+        public DbSet<AcademicAndExperienceView> academicAndExperienceViews { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
@@ -50,6 +52,11 @@ namespace EMPLOYEE_MANAGEMENT.DAL
                 .WithOne(u => u.Experience)
                 .HasForeignKey<Experience>(ex => ex.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AcademicAndExperienceView>()
+                .ToView("AcademicsAndExperienceView");
+            modelBuilder.Entity<AcademicAndExperienceView>().HasNoKey();
+
         }
 
     }

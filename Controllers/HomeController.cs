@@ -249,7 +249,6 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return RedirectToAction("AddAcademicDetails");
         }
 
-
         public async Task<IActionResult> UpdateUserDetails(Guid id)
         {
             String userId = HttpContext.Session.GetString("UserId");
@@ -504,6 +503,38 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             }
 
             return View(experience);
+        }
+
+        /*public async Task<IActionResult> ViewAcademicAndExperienceDetails(Guid id)
+        {
+            var AcademicAndExperience = await applicationDbContext.academicAndExperienceViews
+                .Where(a =>
+                    (a.AcademicUserId != null && a.AcademicUserId == id) ||
+                    (a.ExperienceUserId != null && a.ExperienceUserId == id))
+                .ToListAsync();
+
+            if (AcademicAndExperience == null)
+            {
+                return NotFound("Academic and Experience Not Found");
+            }
+            return View(AcademicAndExperience);
+        }*/
+
+        public async Task<IActionResult> ViewAcademicAndExperienceDetails(Guid id)
+        {
+            var academicDetails = await applicationDbContext.AcademicDetails
+                .Where(ad => ad.UserId == id).ToListAsync();
+
+            var experience = await applicationDbContext.Experience
+                .Where(e => e.UserId == id).ToListAsync();
+
+            AcademicAndExperience ae = new AcademicAndExperience()
+            {
+                academicDetails = academicDetails,
+                experiences = experience
+            };
+
+            return View(ae);
         }
 
         public IActionResult ViewImage(Guid detailsId)

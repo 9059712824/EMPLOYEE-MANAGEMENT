@@ -99,6 +99,7 @@
                     <td>
                         @if(Context.Session.GetString("Role") == "ADMIN" || Context.Session.GetString("Role") == "DEPARTMEN_HEAD" || Context.Session.GetString("UserId") == item.DepartmentHead.ToString())
                         {
+                            <a href="@Url.Action("ViewAcademicAndExperienceDetails", new { id = item.UserId })" class="btn btn-primary">View</a>
                             <a href="@Url.Action("UpdateUserDetails", new { id = item.UserId })" class="btn btn-primary">Update</a>
                             <a href="#" onclick="confirmDelete('@item.UserId')" class="btn btn-danger">Delete</a>
                         }
