@@ -505,20 +505,6 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return View(experience);
         }
 
-        /*public async Task<IActionResult> ViewAcademicAndExperienceDetails(Guid id)
-        {
-            var AcademicAndExperience = await applicationDbContext.academicAndExperienceViews
-                .Where(a =>
-                    (a.AcademicUserId != null && a.AcademicUserId == id) ||
-                    (a.ExperienceUserId != null && a.ExperienceUserId == id))
-                .ToListAsync();
-
-            if (AcademicAndExperience == null)
-            {
-                return NotFound("Academic and Experience Not Found");
-            }
-            return View(AcademicAndExperience);
-        }*/
 
         public async Task<IActionResult> ViewAcademicAndExperienceDetails(Guid id)
         {
@@ -601,62 +587,24 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             }
 
             Guid Id = Guid.Parse(userId);
-            List<ViewUserDetails> details;
+            List<EmployeeDetails> details;
             if (role == Role.ADMIN.ToString())
             {
-                details = await applicationDbContext.Users
-                    .Join(
-                applicationDbContext.UserDetails,
-                users => users.UserId,
-                userDetails => userDetails.UserId,
-                (users, userDetails) => new ViewUserDetails
-                {
-                    UserId = users.UserId,
-                    Email = users.Email,
-                    Role = users.Role,
-                    FirstName = userDetails.FirstName,
-                    LastName = userDetails.LastName,
-                    EmployeeNumber = userDetails.Number,
-                    Gender = userDetails.Gender,
-                    DOB = userDetails.DOB,
-                    Age = userDetails.Age,
-                    Address = userDetails.Address,
-                    Department = userDetails.Department,
-                    DepartmentHead= userDetails.DepartmentHead,
-                    Salary = userDetails.Salary
-                })
+                details = await applicationDbContext.employeeDetails
+
                     .Where(users => users.Role == Role.EMPLOYEE.ToString() || users.Role == Role.DEPARTMENT_HEAD.ToString())
                     .ToListAsync();
             }
             else if (role == Role.DEPARTMENT_HEAD.ToString())
             {
-                details = await applicationDbContext.Users
-                    .Join(
-                applicationDbContext.UserDetails,
-                users => users.UserId,
-                userDetails => userDetails.UserId,
-                (users, userDetails) => new ViewUserDetails
-                {
-                    UserId = users.UserId,
-                    Email = users.Email,
-                    Role = users.Role,
-                    FirstName = userDetails.FirstName,
-                    LastName = userDetails.LastName,
-                    EmployeeNumber = userDetails.Number,
-                    Gender = userDetails.Gender,
-                    DOB = userDetails.DOB,
-                    Age = userDetails.Age,
-                    Address = userDetails.Address,
-                    Department = userDetails.Department,
-                    DepartmentHead = userDetails.DepartmentHead,
-                    Salary = userDetails.Salary
-                })
+                details = await applicationDbContext.employeeDetails
+                    
                     .Where(users => users.Role == Role.EMPLOYEE.ToString())
                     .ToListAsync();
             }
             else
             {
-                details = new List<ViewUserDetails>();
+                details = new List<EmployeeDetails>();
             }
 
             return View(details);

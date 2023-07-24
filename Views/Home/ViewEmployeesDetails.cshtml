@@ -1,4 +1,4 @@
-﻿@model List<EMPLOYEE_MANAGEMENT.DTO.ViewUserDetails>
+﻿@model List<EMPLOYEE_MANAGEMENT.DTO.EmployeeDetails>
 
 <!DOCTYPE html>
 <html>
@@ -92,7 +92,7 @@
                     <td>@item.Role</td>
                     <td>@item.FirstName</td>
                     <td>@item.LastName</td>
-                    <td>@item.EmployeeNumber</td>
+                    <td>@item.Number</td>
                     <td>@item.Gender</td>
                     <td>@item.DOB.ToLongDateString()</td>
                     <td>@item.Age</td>
@@ -102,7 +102,7 @@
                     <td>
                         @if(Context.Session.GetString("Role") == "ADMIN" || Context.Session.GetString("Role") == "DEPARTMEN_HEAD" || Context.Session.GetString("UserId") == item.DepartmentHead.ToString())
                         {
-                            <a href="" class="btn btn-primary">
+                            <a href="@Url.Action("ViewAcademicAndExperienceDetails",new { id=item.UserId })" class="btn btn-primary">
                                 <span class="glyphicon glyphicon-eye-open"></span>
                             </a>
                             <a href="@Url.Action("UpdateUserDetails", new { id = item.UserId })" class="btn btn-warning">

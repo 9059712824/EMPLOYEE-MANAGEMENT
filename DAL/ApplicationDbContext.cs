@@ -1,4 +1,5 @@
-﻿using EMPLOYEE_MANAGEMENT.Models;
+﻿using EMPLOYEE_MANAGEMENT.DTO;
+using EMPLOYEE_MANAGEMENT.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMPLOYEE_MANAGEMENT.DAL
@@ -18,7 +19,7 @@ namespace EMPLOYEE_MANAGEMENT.DAL
 
         public DbSet<Experience> Experience { get; set; }
 
-        public DbSet<AcademicAndExperienceView> academicAndExperienceViews { get; set; }
+        public DbSet<EmployeeDetails> employeeDetails{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,9 +54,9 @@ namespace EMPLOYEE_MANAGEMENT.DAL
                 .HasForeignKey<Experience>(ex => ex.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<AcademicAndExperienceView>()
-                .ToView("AcademicsAndExperienceView");
-            modelBuilder.Entity<AcademicAndExperienceView>().HasNoKey();
+            modelBuilder.Entity<EmployeeDetails>()
+                .ToView("EmployeeDetails");
+            modelBuilder.Entity<EmployeeDetails>().HasNoKey();
 
         }
 
