@@ -8,8 +8,8 @@
 }
 <a href="@Url.Action("ViewUserDetails")" class="btn btn-primary" style="background-color: blue; color: white;">View Details</a>
 <a href="@Url.Action("ViewAcademicDetails")" class="btn btn-primary" style="background-color: orange; color: white;">Academic Details</a>
-<a href="@Url.Action("ViewExperienceDetails")" class="btn btn-primary" style="background-color: yellow; color: white;">Experirence Details</a>
+<a href="@Url.Action("ViewExperienceDetails")" class="btn btn-primary" style="background-color:lightpink; color: white;">Experience Details</a>
 @if (Context.Session.GetString("Role") == "ADMIN" || Context.Session.GetString("Role") == "DEPARTMENT_HEAD")
 {
-    <a href="@Url.Action("ViewEmployeesDetails")" class="btn btn-primary" style="background-color: pink; color: white;">Employees Details</a>
+    <a href="@Url.Action("ViewEmployeesDetails")" class="btn btn-primary" style="background-color: mediumpurple; color: white;">Employees Details</a>
 }
