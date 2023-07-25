@@ -74,16 +74,67 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 {
                     return RedirectToAction("AddUserDetails");
                 }
-                if (newUser.Role == Role.ADMIN.ToString() || newUser.Role == Role.DEPARTMENT_HEAD.ToString())
-                {
-                    return RedirectToAction("Add");
-                }
-                if(newUser.Role == Role.EMPLOYEE.ToString())
-                {
-                    return RedirectToAction("Index");
-                }
             }
-            return RedirectToAction("Add");
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult EmailValidation()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EmailValidation(EmailDTO emailDTO)
+        {
+            var email = emailDTO.Email;
+            var user = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if(user == null)
+            {
+                return NotFound("Email Doesn't Exists " + email);
+            }
+            double otp = RandomNumber(100000, 999999);
+            user.OTP = otp;
+            user.OTPGeneratedTime = DateTime.Now;
+            sendOTPEmail(user.Email, "", otp, user.Role.ToString());
+            HttpContext.Session.SetString("UserId", user.UserId.ToString());
+            applicationDbContext.Users.Update(user);
+            await applicationDbContext.SaveChangesAsync();
+            return RedirectToAction("ForgotPassword");
+        }
+
+        public IActionResult ForgotPassword()
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login");
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO forgotPasswordDTO)
+        {
+            Guid userId = Guid.Parse(HttpContext.Session.GetString("UserId"));
+            var otp = forgotPasswordDTO.OTP;
+            var user = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            if(user.OTP != otp)
+            {
+                return NotFound("Entered OTP is incorrect, Please Re-Enter correct OTP");
+            }
+            if(!forgotPasswordDTO.Password.Equals(forgotPasswordDTO.ConfirmPassword))
+            {
+                return NotFound("Entered Password and Confirm Password Not Matched");
+            }
+            if(VerifyPassword(forgotPasswordDTO.Password, user.Password))
+            {
+                return NotFound("Entered Password already exists in our System, Please create a new Password");
+            }
+            user.Password = Encrypt(forgotPasswordDTO.Password);
+            applicationDbContext.Users.Update(user);
+            await applicationDbContext.SaveChangesAsync();
+            return RedirectToAction("Login");
+
         }
 
         public IActionResult Add()

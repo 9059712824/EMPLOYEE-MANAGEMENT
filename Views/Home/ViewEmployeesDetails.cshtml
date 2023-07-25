@@ -100,11 +100,11 @@
                     <td>@item.Department</td>
                     <td>@item.Salary</td>
                     <td>
+                        <a href="@Url.Action("ViewAcademicAndExperienceDetails",new { id=item.UserId })" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                        </a>
                         @if(Context.Session.GetString("Role") == "ADMIN" || Context.Session.GetString("Role") == "DEPARTMEN_HEAD" || Context.Session.GetString("UserId") == item.DepartmentHead.ToString())
                         {
-                            <a href="@Url.Action("ViewAcademicAndExperienceDetails",new { id=item.UserId })" class="btn btn-primary">
-                                <span class="glyphicon glyphicon-eye-open"></span>
-                            </a>
                             <a href="@Url.Action("UpdateUserDetails", new { id = item.UserId })" class="btn btn-warning">
                             <span class="glyphicon glyphicon-pencil"></span></a>
                             <a href="#" onclick="confirmDelete('@item.UserId')" class="btn btn-danger">

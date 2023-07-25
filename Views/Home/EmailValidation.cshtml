@@ -1,0 +1,11 @@
+﻿@model EMPLOYEE_MANAGEMENT.DTO.EmailDTO
+@{
+    ViewBag.Title = "Email";
+}
+<form method="post" action="EmailValidation" class="mt-5">
+    <div class="mb-3">
+        <label for="Email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="Email" asp-for="Email" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
