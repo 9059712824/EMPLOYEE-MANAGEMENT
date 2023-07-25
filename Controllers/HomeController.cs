@@ -1,5 +1,6 @@
 ﻿using EMPLOYEE_MANAGEMENT.DAL;
 using EMPLOYEE_MANAGEMENT.DTO;
+using EMPLOYEE_MANAGEMENT.Exceptions;
 using EMPLOYEE_MANAGEMENT.Models;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
@@ -149,13 +150,22 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(User user)
+        public async Task<IActionResult> Add([FromBody]AddUserDTO user)
         {
             if (user == null)
             {
-                throw new ArgumentNullException("user");
+                return BadRequest(new { errorMessage = "Invalid user data." });
             }
 
+            var users = await applicationDbContext.Users.ToListAsync();
+
+            foreach(var i in users)
+            {
+                if (i.Email.Equals(user.Email))
+                {
+                    return BadRequest(new { message = "Email Already exists " + user.Email });
+                }
+            }
             var password = RandomPassword();
             if (user != null)
             {

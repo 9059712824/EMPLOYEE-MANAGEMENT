@@ -1,15 +1,14 @@
-﻿@model EMPLOYEE_MANAGEMENT.Models.User
-@{
+﻿@{
     ViewBag.Title = "Create";
 }
-<form method="post" action="Add" class="mt-5">
+<div class="mt-5">
     <div class="mb-3">
         <label for="Email" class="form-label">Email</label>
-        <input type="email" class="form-control" id="Email" asp-for="Email" required>
+        <input type="email" class="form-control" id="Email" Name="Email" required>
     </div>
     <div class="mb-3">
         <label for="Role" class="form-label">Role</label>
-        <select class="form-control" id="Role" asp-for="Role" required>
+        <select class="form-control" id="Role" Name="Role" required>
             @if (ViewBag.Role != "DEPARTMENT_HEAD")
             {
                 <option value="DEPARTMENT_HEAD">Department Head</option>
@@ -18,9 +17,61 @@
         </select>
     </div>
 
-    <button type="submit" class="btn btn-primary">Submit</button>
-   <!-- <button type="submit" class="btn btn-primary">Back</button>-->
+    <button type="button" onclick="confirmAdd()" class="btn btn-primary">Submit</button>
     <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Back</a>
+</div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
 
-</form>
+<script>
+    function confirmAdd() {
+        $.ajax({
+            url: '@Url.Action("Add")',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                Email: document.getElementById('Email').value,
+                Role: document.getElementById('Role').value
+            }),
+            success: function (response) {
+                // Handle the success response here if needed
+                showSuccessMessage();
+            },
+            error: function (xhr, status, error) {
+                // Handle the error response here
+                var errorMessage = "An error occurred while adding the user.";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                showErrorMessage(errorMessage);
+            }
+        });
+    }
+
+    // Function to show the success message using SweetAlert
+    function showSuccessMessage() {
+        Swal.fire({
+            icon: 'success',
+            title: 'User has been added',
+            text: 'The user has been added successfully.',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            // Optionally, you can perform additional actions here after the user clicks OK
+            // For example, you can redirect the user to another page
+            if (result.isConfirmed) {
+                window.location.href = '@Url.Action("Index", "Home")';
+            }
+        });
+    }
+
+    // Function to show the error message using SweetAlert
+    function showErrorMessage(errorMessage) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorMessage,
+            confirmButtonText: 'OK'
+        });
+    }
+</script>
