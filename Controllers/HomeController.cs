@@ -1,6 +1,5 @@
 ﻿using EMPLOYEE_MANAGEMENT.DAL;
 using EMPLOYEE_MANAGEMENT.DTO;
-using EMPLOYEE_MANAGEMENT.Exceptions;
 using EMPLOYEE_MANAGEMENT.Models;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;

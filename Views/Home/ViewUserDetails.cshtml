@@ -46,7 +46,7 @@
         <label for="Department" class="form-label">Department</label>
     <input type="text" class="form-control no-highlight" id="Department" asp-for="Department" required disabled>
     </div>
-    <a href="@Url.Content("~/Home")" button type="submit" class="btn btn-primary">Back</a>
+    <a href="@Url.Action("Index")" button type="submit" class="btn btn-primary">Back</a>
 <script>
     $(document).ready(function () {
         $('.no-highlight').on('mousedown', function (e) {
