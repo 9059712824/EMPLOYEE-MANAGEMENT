@@ -92,13 +92,24 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             {
                 return NotFound("Email Doesn't Exists " + email);
             }
-            double otp = RandomNumber(100000, 999999);
-            user.OTP = otp;
-            user.OTPGeneratedTime = DateTime.Now;
-            sendOTPEmail(user.Email, "", otp, user.Role.ToString());
+            if (TimeDifference(user.OTPGeneratedTime))
+            {
+                double otp = RandomNumber(100000, 999999);
+
+                DateTime date = DateTime.Now;
+
+                user.OTP = otp;
+                user.OTPGeneratedTime=date;
+
+                applicationDbContext.Users.Update(user);
+                await applicationDbContext.SaveChangesAsync();
+                sendOTPEmail(user.Email, "", otp, user.Role.ToString());
+            }
+            else
+            {
+                sendOTPEmail(user.Email, "", user.OTP, user.Role.ToString());
+            }
             HttpContext.Session.SetString("UserId", user.UserId.ToString());
-            applicationDbContext.Users.Update(user);
-            await applicationDbContext.SaveChangesAsync();
             return RedirectToAction("ForgotPassword");
         }
 
@@ -113,28 +124,30 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO forgotPasswordDTO)
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO forgotPasswordDTO)
         {
             Guid userId = Guid.Parse(HttpContext.Session.GetString("UserId"));
-            var otp = forgotPasswordDTO.OTP;
             var user = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-            if(user.OTP != otp)
+            if (user == null)
             {
-                return NotFound("Entered OTP is incorrect, Please Re-Enter correct OTP");
+                return BadRequest(new { message = "No User Found" });
             }
-            if(!forgotPasswordDTO.Password.Equals(forgotPasswordDTO.ConfirmPassword))
+            if (user.OTP != Double.Parse(forgotPasswordDTO.OTP))
             {
-                return NotFound("Entered Password and Confirm Password Not Matched");
+                return BadRequest(new { message = "Entered OTP is incorrect, Please Re-Enter correct OTP" });
             }
-            if(VerifyPassword(forgotPasswordDTO.Password, user.Password))
+            if (!forgotPasswordDTO.Password.Equals(forgotPasswordDTO.ConfirmPassword))
             {
-                return NotFound("Entered Password already exists in our System, Please create a new Password");
+                return BadRequest(new { message = "Entered Password and Confirm Password Not Matched" });
+            }
+            if (VerifyPassword(forgotPasswordDTO.Password, user.Password))
+            {
+                return BadRequest(new { message = "Entered Password already exists in our System, Please create a new Password" });
             }
             user.Password = Encrypt(forgotPasswordDTO.Password);
             applicationDbContext.Users.Update(user);
             await applicationDbContext.SaveChangesAsync();
             return RedirectToAction("Login");
-
         }
 
         public IActionResult Add()
@@ -153,7 +166,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         {
             if (user == null)
             {
-                return BadRequest(new { errorMessage = "Invalid user data." });
+                return BadRequest(new { message = "Invalid user data." });
             }
 
             var users = await applicationDbContext.Users.ToListAsync();
@@ -609,6 +622,27 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return View();
         }
 
+        public IActionResult ViewPDF(Guid detailsId)
+        {
+            byte[] pdf = null;
+            var academicDetails = applicationDbContext.AcademicDetails.FirstOrDefault(ad => ad.Id ==detailsId);
+            var experience = applicationDbContext.Experience.FirstOrDefault(e => e.Id == detailsId);
+
+            if(academicDetails != null && academicDetails.proof != null && academicDetails.proof.Length > 0 )
+            {
+                pdf = academicDetails.proof;
+            }
+            else if(experience != null && experience.proof != null && experience.proof.Length > 0)
+            {
+                pdf = experience.proof;
+            }
+            else
+            {
+                return BadRequest(new { errorMessage = "Invalid user data." });
+            }
+
+            return View(pdf);
+        }
 
         public IActionResult ViewText(Guid detailsId)
         {
@@ -765,7 +799,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         {
             DateTime currentTime = DateTime.Now;
             TimeSpan time = currentTime-timeDifference;
-            if ((int)time.TotalMinutes >= 5)
+            if ((int)time.TotalMinutes > 5)
             {
                 return true;
             }

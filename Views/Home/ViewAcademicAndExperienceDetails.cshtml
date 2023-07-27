@@ -63,6 +63,10 @@
                         {
                             <a href="@Url.Action("ViewImage", "Home", new { detailsId = Model.academicDetails[i].Id })" target="_blank">View Image</a>
                         }
+                        else if (fileExtension == ".pdf")
+                        {
+                            <a href="@Url.Action("ViewPDF", "Home", new { detailsId = Model.academicDetails[i].Id })" target="_blank">View PDF</a>
+                        }
                         else
                         {
                             <span>Invalid proof file</span>
@@ -117,6 +121,10 @@
                                 else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".gif")
                                 {
                                     <a href="@Url.Action("ViewImage", "Home", new { detailsId = Model.experiences[i].Id })" target="_blank">View Image</a>
+                                }
+                                else if (fileExtension == ".pdf")
+                                {
+                                    <a href="@Url.Action("ViewPDF", "Home", new { detailsId = Model.experiences[i].Id })" target="_blank">View PDF</a>
                                 }
                                 else
                                 {
