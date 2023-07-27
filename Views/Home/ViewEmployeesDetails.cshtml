@@ -75,6 +75,19 @@
     }
     else
     {
+        <div class="form-group d-flex justify-content-end">
+            @using (Html.BeginForm("ViewEmployeesDetails", "Home", null, FormMethod.Post))
+            {
+                <div class="input-group" style="text-align: center">
+                    @Html.TextBox("searchString", ViewBag.CurrentFilter as string, new { @class = "form-control", @placeholder = "Search..." })
+                    <div class="input-group-btn">
+                        <input type="submit" value="Search" class="btn btn-primary" style=" display: inline-block" />
+                    </div>
+                </div>
+            }
+        </div>
+        <button id="deleteAllButton" class="btn btn-danger" style="float: right;">DeleteAll</button>
+        <br />
         <table>
             <tr>
                 <th>Email</th>

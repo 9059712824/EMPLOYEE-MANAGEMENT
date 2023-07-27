@@ -6,9 +6,12 @@
 {
     <a href="@Url.Action("Add")" class="btn btn-primary" style="background-color:lightcoral; color: white;">Add User</a>
 }
-<a href="@Url.Action("ViewUserDetails")" class="btn btn-primary" style="background-color:coral; color: white;">View Details</a>
-<a href="@Url.Action("ViewAcademicDetails")" class="btn btn-primary" style="background-color: indianred; color: white;">Academic Details</a>
-<a href="@Url.Action("ViewExperienceDetails")" class="btn btn-primary" style="background-color:tomato; color: white;">Experience Details</a>
+@if (Context.Session.GetString("Role") != "ADMIN")
+{
+    <a href="@Url.Action("ViewUserDetails")" class="btn btn-primary" style="background-color:coral; color: white;">View Details</a>
+    <a href="@Url.Action("ViewAcademicDetails")" class="btn btn-primary" style="background-color: indianred; color: white;">Academic Details</a>
+    <a href="@Url.Action("ViewExperienceDetails")" class="btn btn-primary" style="background-color:tomato; color: white;">Experience Details</a>
+}
 @if (Context.Session.GetString("Role") == "ADMIN" || Context.Session.GetString("Role") == "DEPARTMENT_HEAD")
 {
     <a href="@Url.Action("ViewEmployeesDetails")" class="btn btn-primary" style="background-color:orangered; color: white;">Employees Details</a>

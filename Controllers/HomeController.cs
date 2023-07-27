@@ -136,6 +136,14 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             {
                 return BadRequest(new { message = "Entered OTP is incorrect, Please Re-Enter correct OTP" });
             }
+            if(forgotPasswordDTO.Password.Length < 8)
+            {
+                return BadRequest(new { message = "Length of Password must be equal or more than 8 Characters" });
+            }
+            if (forgotPasswordDTO.ConfirmPassword.Length < 8)
+            {
+                return BadRequest(new { message = "Length of ConfirmPassword must be equal or more than 8 Characters" });
+            }
             if (!forgotPasswordDTO.Password.Equals(forgotPasswordDTO.ConfirmPassword))
             {
                 return BadRequest(new { message = "Entered Password and Confirm Password Not Matched" });
@@ -703,6 +711,40 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
             return View(details);
         }
+
+        [HttpPost]
+        public IActionResult ViewEmployeesDetails(string searchString)
+        {
+            ViewBag.CurrentFilter = searchString;
+
+            var employeeDetails = applicationDbContext.employeeDetails.ToList();
+            if (employeeDetails == null || employeeDetails.Count == 0)
+            {
+                return BadRequest(new { message = "No Users Found" });
+            }
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                int searchNumber;
+                int.TryParse(searchString, out searchNumber);
+
+                employeeDetails = employeeDetails.Where(e =>
+                    e.FirstName.Contains(searchString) ||
+                    e.LastName.Contains(searchString) ||
+                    e.Email.Contains(searchString) ||
+                    e.Role.Contains(searchString) ||
+                    e.Number == searchNumber ||
+                    e.Department.Contains(searchString)
+                ).ToList(); 
+            }
+
+            if (employeeDetails == null || employeeDetails.Count == 0)
+            {
+                return BadRequest(new { message = "No Results Found" });
+            }
+
+            return View(employeeDetails);
+        }
+
 
         public IActionResult Logout()
         {
