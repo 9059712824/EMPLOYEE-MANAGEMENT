@@ -1,5 +1,4 @@
-﻿@model EMPLOYEE_MANAGEMENT.Models.User
-@{
+﻿@{
     ViewBag.Title = "Login";
 }
 <!DOCTYPE html>
@@ -114,31 +113,87 @@ body {
 </style>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        function confirmLogin() {
+            $.ajax({
+                url: '@Url.Action("Login")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    Email: document.getElementById('Email').value,
+                    Password: document.getElementById('Password').value
+                }),
+                success: function (response) {
+                    var role = response.role;
+                    var redirectUrl = response.redirectUrl;
+                    showSuccessMessage(role,redirectUrl);
+                },
+                error: function (xhr, status, error) {
+                    // Handle the error response here
+                    var errorMessage = "An error occurred while Logging In.";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    showErrorMessage(errorMessage);
+                }
+            });
+        }
+
+        // Function to show the success message using SweetAlert
+        function showSuccessMessage(role, redirectUrl) {
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Login SuccessFull',
+                text: role + ' has been Logged In successfully.',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                // Optionally, you can perform additional actions here after the user clicks OK
+                // For example, you can redirect the user to another page
+                if (result.isConfirmed) {
+                    window.location.href = redirectUrl;
+                }
+            });
+        }
+
+        // Function to show the error message using SweetAlert
+        function showErrorMessage(errorMessage) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="wrapper">
         <div class="form-wrapper sign-in">
-            <form asp-controller="Home" asp-action="Login" method="post">
+            <form>
                 <h2>Login</h2>
                 <div class="input-group">
-                    <label asp-for="Email"></label>
-                    <input type="text" asp-for="Email" class="form-control" required>
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                    <label>Email</label>
+                    <input type="text" id="Email" class="form-control" required>
                 </div>
                 <div class="input-group">
-                    <label asp-for="Password"></label>
-                    <input asp-for="Password" class="form-control" type="password" required>
-                    <span asp-validation-for="Password" class="text-danger"></span>
+                    <label>Password</label>
+                    <input id="Password" class="form-control" type="password" required>
                 </div>
 
                 <div class="forgot-pass">
                     <a href="@Url.Action("EmailValidation")">Forgot Password?</a>
                 </div>
-                <button type="submit" class="btn">Login</button>
+                <button type="button" onclick="confirmLogin()" class="btn">Login</button>
             </form>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
 </body>
 </html>
 

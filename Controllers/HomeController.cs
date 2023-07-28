@@ -29,7 +29,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(User user)
+        public async Task<IActionResult> Login([FromBody] LoginDTO user)
         {
             if (user.Email == null || user.Password == null)
             {
@@ -39,11 +39,11 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
             if (newUser == null)
             {
-               return NotFound(user.Email);
+                return NotFound(user.Email);
             }
             if (newUser.Email != user.Email || !VerifyPassword(user.Password, newUser.Password))
             {
-                throw new InvalidDataException("user");
+                return BadRequest(new { message = "Entered Incorrect Password, Check and Re-Enter Correct Password" });
             }
             HttpContext.Session.SetString("UserId", newUser.UserId.ToString());
             HttpContext.Session.SetString("Role", newUser.Role.ToString());
@@ -64,18 +64,31 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                         await applicationDbContext.SaveChangesAsync();
                         sendOTPEmail(newUser.Email, "", otp, newUser.Role.ToString());
                     }
-                    else
+                    var response = new
                     {
-                        sendOTPEmail(newUser.Email,"",newUser.OTP, newUser.Role.ToString());
-                    }
-                    return RedirectToAction("Register");
+                        role = newUser.Role,
+                        redirectUrl = Url.Action("Register", "Home")
+                    };
+
+                    return Ok(response);
                 }
                 else if (newUser.ProfilesetupCompleted == ProfileStatus.PENDING.ToString())
                 {
-                    return RedirectToAction("AddUserDetails");
+                    var response = new
+                    {
+                        role = newUser.Role,
+                        redirectUrl = Url.Action("AddUserDetails", "Home")
+                    };
+
+                    return Ok(response);
                 }
             }
-            return RedirectToAction("Index");
+            var defaultresponse = new
+            {
+                role = newUser.Role,
+                redirectUrl = Url.Action("Index", "Home")
+            };
+            return Ok(defaultresponse);
         }
 
         public IActionResult EmailValidation()
@@ -743,6 +756,28 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             }
 
             return View(employeeDetails);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteAll(List<string> ids)
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                return BadRequest(new { message = "No Id's Found" });
+            }
+
+            foreach (string id in ids)
+            {
+                var emp = applicationDbContext.Users.FirstOrDefault(u => u.UserId == Guid.Parse(id));
+                if (emp != null)
+                {
+                    applicationDbContext.Users.Remove(emp);
+                }
+            }
+
+            applicationDbContext.SaveChanges();
+
+            return Json(new { success = true });
         }
 
 

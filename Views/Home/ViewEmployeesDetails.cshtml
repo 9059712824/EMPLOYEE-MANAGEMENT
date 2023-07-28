@@ -64,6 +64,78 @@
             }
         });
     }
+        $(document).ready(function () {
+            $("#deleteAllButton").click(function () {
+                var selectedItems = [];
+
+                // Collect IDs of selected items
+                $(".checkbox-item").each(function () {
+                    if ($(this).is(":checked")) {
+                        // Get the value (ID) associated with the checkbox
+                        var itemId = parseInt($(this).val());
+                        selectedItems.push(itemId);
+                    }
+                });
+                Swal.fire({
+                    title: 'Are you sure about deleting these employees?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete them!',
+                    cancelButtonText: 'No, cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("DeleteAll", "Home")',
+                            type: 'POST',
+                            data: { ids: selectedItems },
+                            success: function (response) {
+                                // Handle success response
+                                if (response.success) {
+                                    Swal.fire('Deleted!', 'The employees have been deleted.', 'success').then(() => {
+                                        window.location.href = '@Url.Action("ViewEmployeesDetails", "Home")';
+                                    });
+                                } else {
+                                    Swal.fire('Error!', 'An error occurred while deleting the employees.', 'error');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                // Handle error response
+                                Swal.fire('Error!', 'An error occurred while deleting the employees.', 'error');
+                            }
+
+                        });
+                    }
+                });
+            });
+
+            // Select/deselect all checkboxes
+            $("#checkAll").change(function () {
+                $(".checkbox-item").prop("checked", $(this).prop("checked"));
+            });
+
+            // Check if all checkboxes are selected and update the "Select All" checkbox accordingly
+            $(".checkbox-item").change(function () {
+                var allChecked = true;
+
+                $(".checkbox-item").each(function () {
+                    if (!$(this).prop("checked")) {
+                        allChecked = false;
+                        return false; // Exit the loop if any checkbox is not checked
+                    }
+                });
+
+                $("#checkAll").prop("checked", allChecked);
+            });
+
+
+            // Deselect "Select All" checkbox if any individual checkbox is deselected
+            $(".checkbox-item").change(function () {
+                if (!$(this).prop("checked")) {
+                    $("#checkAll").prop("checked", false);
+                }
+            });
+        });
     </script>
 </head>
 <body>
@@ -90,6 +162,7 @@
         <br />
         <table>
             <tr>
+                <th><input type="checkbox" id="checkAll"></th>
                 <th>Email</th>
                 <th>Role</th>
                 <th>First Name</th>
@@ -107,6 +180,7 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td><input type="checkbox" class="checkbox-item" value="@item.UserId"></td>
                     <td>@item.Email</td>
                     <td>@item.Role</td>
                     <td>@item.FirstName</td>
