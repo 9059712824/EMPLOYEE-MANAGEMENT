@@ -231,7 +231,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterDTO register)
+        public async Task<IActionResult> Register([FromBody] RegisterDTO register)
         {
             String UserId = HttpContext.Session.GetString("UserId");
             var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(UserId));
@@ -240,24 +240,29 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             {
                 throw new ArgumentNullException();
             }
-            if (TimeDifference(newUser.OTPGeneratedTime))
+            if(register.NewPassword.Length < 8)
             {
-                double otp = RandomNumber(100000, 999999);
-
-                DateTime date = DateTime.Now;
-
-                newUser.OTP = otp;
-                newUser.OTPGeneratedTime=date;
-
-                applicationDbContext.Users.Update(newUser);
-                await applicationDbContext.SaveChangesAsync();
-                HttpContext.Session.SetString("UserId", UserId);
-                sendOTPEmail(newUser.Email, "", otp, newUser.Role.ToString());
-                return RedirectToAction("Register");
+                return BadRequest(new { message = "Please Enter NewPassword with Length equal or more than 8 characters" });
+            }
+            if (register.ConfirmNewpassword.Length < 8)
+            {
+                return BadRequest(new { message = "Please Enter ConfirmNewpassword with Length equal or more than 8 characters" });
+            }
+            if (!register.NewPassword.Equals(register.ConfirmNewpassword))
+            {
+                return BadRequest(new { message = "New Password and Confirm New Password Not Matched" });
+            }
+            if(register.Password.Equals(register.NewPassword))
+            {
+                return BadRequest(new { message = "Old Password and NewPassword Matched, Please Enter a New Password" });
             }
             if (!VerifyPassword(register.Password, newUser.Password))
             {
-                throw new InvalidDataException("Entered Password is Incorrect");
+                return BadRequest( new { message = "Entered Password is Incorrect" } );
+            }
+            if(register.OTP != newUser.OTP)
+            {
+                return BadRequest(new { message = "Entered Incorrect OTP, Please check and Re-Enter Correct OTP" });
             }
             if (register.NewPassword == register.ConfirmNewpassword && register.OTP == newUser.OTP)
             {
