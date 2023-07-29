@@ -455,6 +455,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             }
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> AddAcademicDetails(AcademicDetailsDTO academicDetail, IFormFile proof)
         {
@@ -484,6 +485,150 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 throw new InvalidDataException();
             }
 
+            // Get the list of existing academic details for the user
+            var academicDetails = applicationDbContext.academicDetailsViews
+                .Where(ad => ad.UserId == userId)
+                .ToList();
+
+            List<string> existingAcademicNames = academicDetails.Select(ad => ad.Name).ToList();
+
+            // Validation 1: Check if the academic detail already exists for the user
+            // Validation 3: Check if the academic detail already exists for the user
+            if (existingAcademicNames.Contains(academicDetail.Name))
+            {
+                return BadRequest(new { message = $"Academic Details of {academicDetail.Name} Already exists" });
+            }
+
+            // Validation 4: Check specific cases based on academicDetail.Name and academics.Name
+            switch (academicDetail.Name)
+            {
+                case "Intermediate(10+2)":
+
+                    if (!existingAcademicNames.Contains("School"))
+                    {
+                        // School exists
+                        return BadRequest(new { message = "Academic Details of School Not exists" });
+                    }
+                    if (existingAcademicNames.Contains("Diploma"))
+                    {
+                        // Diploma exists
+                        return BadRequest(new { message = "Academic Details of Diploma Already exists" });
+                    }
+                    break;
+
+                case "Diploma":
+                    if (!existingAcademicNames.Contains("School"))
+                    {
+                        // School exists
+                        return BadRequest(new { message = "Academic Details of School Not exists" });
+                    }
+                    if (existingAcademicNames.Contains("Intermediate(10+2)"))
+                    {
+                        // Intermediate exists
+                        return BadRequest(new { message = "Academic Details of Intermediate(10+2) Already exists" });
+                    }
+                    break;
+
+                case "BSC":
+                    if (!existingAcademicNames.Contains("School"))
+                    {
+                        // School exists
+                        return BadRequest(new { message = "Academic Details of School Not exists" });
+                    }
+                    if (!existingAcademicNames.Contains("Intermediate(10+2)") && !existingAcademicNames.Contains("Diploma"))
+                    {
+                        // Intermediate or Diploma exists
+                        return BadRequest(new { message = "Academic Details of Intermediate(10+2) or Diploma Not exists" });
+                    }
+                    break;
+
+                case "BCA":
+                    if (!existingAcademicNames.Contains("School"))
+                    {
+                        // School exists
+                        return BadRequest(new { message = "Academic Details of School Not exists" });
+                    }
+                    if (!existingAcademicNames.Contains("Intermediate(10+2)") && !existingAcademicNames.Contains("Diploma"))
+                    {
+                        // Intermediate or Diploma exists
+                        return BadRequest(new { message = "Academic Details of Intermediate(10+2) or Diploma Not exists" });
+                    }
+                    break;
+
+                case "BTech":
+                    if (!existingAcademicNames.Contains("School"))
+                    {
+                        // School exists
+                        return BadRequest(new { message = "Academic Details of School Not exists" });
+                    }
+                    if (!existingAcademicNames.Contains("Intermediate(10+2)") && !existingAcademicNames.Contains("Diploma"))
+                    {
+                        // Intermediate or Diploma exists
+                        return BadRequest(new { message = "Academic Details of Intermediate(10+2) or Diploma Not exists" });
+                    }
+                    break;
+
+                case "MTech":
+                    if (!existingAcademicNames.Contains("School"))
+                    {
+                        // School exists
+                        return BadRequest(new { message = "Academic Details of School Not exists" });
+                    }
+                    if (!existingAcademicNames.Contains("Intermediate(10+2)") && !existingAcademicNames.Contains("Diploma"))
+                    {
+                        // Intermediate or Diploma exists
+                        return BadRequest(new { message = "Academic Details of Intermediate(10+2) or Diploma Not exists" });
+                    }
+                    if (!existingAcademicNames.Contains("BTech"))
+                    {
+                        // BTech exists
+                        return BadRequest(new { message = "Academic Details of BTech Not exists" });
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            // Validation 5: Check for education gaps between academic years (if required)
+            if (academicDetail.Name == "Intermediate(10+2)" || academicDetail.Name == "Diploma")
+            {
+                var schoolAcademicDetail = academicDetails.FirstOrDefault(ad => ad.Name == "School");
+                if (schoolAcademicDetail != null && academicDetail.StartYear > schoolAcademicDetail.EndYear)
+                {
+                    return BadRequest(new { message = "Education gap "+ (academicDetail.StartYear-schoolAcademicDetail.EndYear) + " Years Exists" });
+                }
+                else if (schoolAcademicDetail != null && academicDetail.StartYear < schoolAcademicDetail.EndYear)
+                {
+                    return BadRequest(new { message = "Invalid Input data of " + academicDetail.Name+ " Start Year" });
+                }
+            }
+            else if (academicDetail.Name == "BTech" || academicDetail.Name == "BSC" || academicDetail.Name == "BCA")
+            {
+                var intermediateOrDiplomaAcademicDetail = academicDetails.FirstOrDefault(ad => ad.Name == "Intermediate(10+2)" || ad.Name == "Diploma");
+                if (intermediateOrDiplomaAcademicDetail != null && academicDetail.StartYear > intermediateOrDiplomaAcademicDetail.EndYear)
+                {
+                    return BadRequest(new { message = "Education gap "+ (academicDetail.StartYear-intermediateOrDiplomaAcademicDetail.EndYear) + " Years Exists" });
+                }
+
+                else if (intermediateOrDiplomaAcademicDetail != null && academicDetail.StartYear < intermediateOrDiplomaAcademicDetail.EndYear)
+                {
+                    return BadRequest(new { message = "Invalid Input data of "+academicDetail.Name + " Start year" });
+                }
+            }
+            else if (academicDetail.Name == "MTech")
+            {
+                var bscOrBcaOrBTechAcademicDetail = academicDetails.FirstOrDefault(ad => ad.Name == "BSC" || ad.Name == "BCA" || ad.Name == "BTech");
+                if (bscOrBcaOrBTechAcademicDetail != null && academicDetail.StartYear > bscOrBcaOrBTechAcademicDetail.EndYear)
+                {
+                    return BadRequest(new { message = "Education gap "+ (academicDetail.StartYear-bscOrBcaOrBTechAcademicDetail.EndYear) + " Years Exists" });
+                }
+                else  if (bscOrBcaOrBTechAcademicDetail != null && academicDetail.StartYear < bscOrBcaOrBTechAcademicDetail.EndYear)
+                {
+                    return BadRequest(new { message = "Invalid Input data of "+academicDetail.Name + " Start year" });
+                }
+            }
+
             if (proof != null && proof.Length > 0)
             {
                 using (var memoryStream = new MemoryStream())
@@ -507,8 +652,13 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 }
             }
 
-            // Return a success response or redirect to another page
-            return RedirectToAction("ViewAcademicDetails");
+            var responseDefault = new
+            {
+                message = "Academic Details Added Successfully",
+                redirectUrl = Url.Action("ViewAcademicDetails", "Home")
+            };
+
+            return Ok(responseDefault);
         }
 
         public async Task<IActionResult> ViewAcademicDetails()

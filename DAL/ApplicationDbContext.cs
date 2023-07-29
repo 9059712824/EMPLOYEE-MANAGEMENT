@@ -21,6 +21,8 @@ namespace EMPLOYEE_MANAGEMENT.DAL
 
         public DbSet<EmployeeDetails> employeeDetails{ get; set; }
 
+        public DbSet<AcademicDetailsView> academicDetailsViews { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
@@ -57,6 +59,10 @@ namespace EMPLOYEE_MANAGEMENT.DAL
             modelBuilder.Entity<EmployeeDetails>()
                 .ToView("EmployeeDetails");
             modelBuilder.Entity<EmployeeDetails>().HasNoKey();
+
+            modelBuilder.Entity<AcademicDetailsView>()
+                .ToView("academicDetailsView");
+            modelBuilder.Entity<AcademicDetailsView>().HasNoKey();
 
         }
 

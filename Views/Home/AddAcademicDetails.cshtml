@@ -1,8 +1,8 @@
-﻿@model EMPLOYEE_MANAGEMENT.DTO.AcademicDetailsDTO
-@{
+﻿@{
     ViewBag.Title = "Add Academic Details";
 }
-<form method="post" action="AddAcademicDetails" class="mt-5" enctype="multipart/form-data">
+
+<form class="mt-5" id="academicForm">
     <div id="academicContainer">
         <div class="academicEntry">
             <div class="mb-3">
@@ -39,9 +39,13 @@
             </div>
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <!-- Add the button to allow users to add new academic detail sections -->
+    <button type="submit" onclick="confirmAdd()" class="btn btn-primary">Submit</button>
 </form>
 
+<!-- Add the scripts at the end of the page -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
 <script>
     var startYearSelect = document.querySelectorAll("select[name='StartYear']");
     var endYearSelect = document.querySelectorAll("select[name='EndYear']");
@@ -100,4 +104,61 @@
             updateEndYearOptions(this, this.parentNode.nextElementSibling.querySelector("select[name='EndYear']"));
         });
     }
+
+    // Function to handle form submission
+    async function confirmAdd() {
+        event.preventDefault();
+
+        // Get the form data
+        var formData = new FormData(document.getElementById("academicForm"));
+        var proofFileInput = $('input[name="proof"]');
+        formData.append("proof", proofFileInput);
+
+        try {
+            const response = await fetch('@Url.Action("AddAcademicDetails")', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                showErrorMessage(errorMessage.message);
+                return;
+            }
+
+            const data = await response.json();
+            var message = data.message;
+            var redirectUrl = data.redirectUrl;
+            showSuccessMessage(message, redirectUrl);
+        } catch (error) {
+            showErrorMessage('An error occurred while Adding data In.');
+        }
+    }
+
+
+    function showSuccessMessage(message, redirectUrl) {
+        Swal.fire({
+                icon: 'success',
+                title: 'AcademicDetails added succesfully',
+                text: message,
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                // Optionally, you can perform additional actions here after the user clicks OK
+                // For example, you can redirect the user to another page
+                if (result.isConfirmed) {
+                    window.location.href = redirectUrl;
+                }
+            });
+    }
+
+    // Function to show the error message using SweetAlert
+    function showErrorMessage(errorMessage) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorMessage,
+            confirmButtonText: 'OK'
+        });
+    }
+
 </script>
