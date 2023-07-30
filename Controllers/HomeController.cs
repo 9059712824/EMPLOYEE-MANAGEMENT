@@ -594,10 +594,10 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             if (academicDetail.Name == "Intermediate(10+2)" || academicDetail.Name == "Diploma")
             {
                 var schoolAcademicDetail = academicDetails.FirstOrDefault(ad => ad.Name == "School");
-                if (schoolAcademicDetail != null && academicDetail.StartYear > schoolAcademicDetail.EndYear)
+                /*if (schoolAcademicDetail != null && academicDetail.StartYear > schoolAcademicDetail.EndYear)
                 {
                     return BadRequest(new { message = "Education gap "+ (academicDetail.StartYear-schoolAcademicDetail.EndYear) + " Years Exists" });
-                }
+                }*/
                 else if (schoolAcademicDetail != null && academicDetail.StartYear < schoolAcademicDetail.EndYear)
                 {
                     return BadRequest(new { message = "Invalid Input data of " + academicDetail.Name+ " Start Year" });
@@ -606,10 +606,10 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             else if (academicDetail.Name == "BTech" || academicDetail.Name == "BSC" || academicDetail.Name == "BCA")
             {
                 var intermediateOrDiplomaAcademicDetail = academicDetails.FirstOrDefault(ad => ad.Name == "Intermediate(10+2)" || ad.Name == "Diploma");
-                if (intermediateOrDiplomaAcademicDetail != null && academicDetail.StartYear > intermediateOrDiplomaAcademicDetail.EndYear)
+                /*if (intermediateOrDiplomaAcademicDetail != null && academicDetail.StartYear > intermediateOrDiplomaAcademicDetail.EndYear)
                 {
                     return BadRequest(new { message = "Education gap "+ (academicDetail.StartYear-intermediateOrDiplomaAcademicDetail.EndYear) + " Years Exists" });
-                }
+                }*/
 
                 else if (intermediateOrDiplomaAcademicDetail != null && academicDetail.StartYear < intermediateOrDiplomaAcademicDetail.EndYear)
                 {
@@ -619,10 +619,10 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             else if (academicDetail.Name == "MTech")
             {
                 var bscOrBcaOrBTechAcademicDetail = academicDetails.FirstOrDefault(ad => ad.Name == "BSC" || ad.Name == "BCA" || ad.Name == "BTech");
-                if (bscOrBcaOrBTechAcademicDetail != null && academicDetail.StartYear > bscOrBcaOrBTechAcademicDetail.EndYear)
+                /*if (bscOrBcaOrBTechAcademicDetail != null && academicDetail.StartYear > bscOrBcaOrBTechAcademicDetail.EndYear)
                 {
                     return BadRequest(new { message = "Education gap "+ (academicDetail.StartYear-bscOrBcaOrBTechAcademicDetail.EndYear) + " Years Exists" });
-                }
+                }*/
                 else  if (bscOrBcaOrBTechAcademicDetail != null && academicDetail.StartYear < bscOrBcaOrBTechAcademicDetail.EndYear)
                 {
                     return BadRequest(new { message = "Invalid Input data of "+academicDetail.Name + " Start year" });
