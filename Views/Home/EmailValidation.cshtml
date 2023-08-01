@@ -1,11 +1,47 @@
-﻿@model EMPLOYEE_MANAGEMENT.DTO.EmailDTO
-@{
+﻿@{
     ViewBag.Title = "Email";
 }
-<form method="post" action="EmailValidation" class="mt-5">
     <div class="mb-3">
         <label for="Email" class="form-label">Email</label>
-        <input type="email" class="form-control" id="Email" asp-for="Email" required>
+        <input type="email" class="form-control" id="Email" required>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+    <button type="submit" onclick="confirmCheck()" class="btn btn-primary">Submit</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        function confirmCheck() {
+            $.ajax({
+                url: '@Url.Action("EmailValidation")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    Email: document.getElementById('Email').value                
+                }),
+                success: function (response) {
+                // Handle the success scenario here
+                // Redirect to the desired URL
+                window.location.href = '@Url.Action("ForgotPassword")'; // Replace ControllerName/SuccessPage with your actual URL
+            },
+                error: function (xhr, status, error) {
+                    // Handle the error response here
+                    var errorMessage = "An error occurred while Logging In.";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    showErrorMessage(errorMessage);
+                }
+            });
+        }
+
+        // Function to show the error message using SweetAlert
+        function showErrorMessage(errorMessage) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>

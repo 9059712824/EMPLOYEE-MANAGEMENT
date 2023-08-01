@@ -1,33 +1,32 @@
-﻿@model EMPLOYEE_MANAGEMENT.DTO.ExperienceDTO
-@{
+﻿@{
     ViewBag.Title = "Add Experience Details";
 }
-<form method="post" action="AddExperienceDetails" class="mt-5" enctype="multipart/form-data">
+<form class="mt-5" id="addExperienceForm">
     <div id="academicContainer">
         <div class="academicEntry">
             <div class="mb-3">
                 <label for="CompanyName" class="form-label">Company Name</label>
-                <input type="text" class="form-control" name="CompanyName" asp-for="CompanyName" required>
+                <input type="text" class="form-control" name="CompanyName" required>
             </div>
             <div class="mb-3">
                 <label for="StartDate" class="form-label">Start Date</label>
-                <input type="date" class="form-control" name="StartDate" asp-for="StartDate" required>
+                <input type="date" class="form-control" name="StartDate" required>
             </div>
             <div class="mb-3">
                 <label for="EndDate" class="form-label">End Date</label>
-                <input type="date" class="form-control" name="EndDate" asp-for="EndDate" required>
+                <input type="date" class="form-control" name="EndDate" required>
             </div>
             <div class="mb-3">
                 <label for="YearsOfWorking" class="form-label">Years of Working</label>
-                <input type="text" class="form-control" name="YearsOfWorking" id="YearsOfWorking" asp-for="YearsOfWorking" readonly>
+                <input type="text" class="form-control" name="YearsOfWorking" id="YearsOfWorking" readonly>
             </div>
             <div class="mb-3">
-                <label for="proof" class="form-label">Proof</label>
-                <input type="file" name="Proof"  required />
+                <label for="proof" class="form-label">proof</label>
+                <input type="file" name="proof" accept=".pdf, .txt, .doc, .docx, .jpg, .jpeg, .png, .gif" required />
             </div>
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" onclick="confirmAdd()" class="btn btn-primary">Submit</button>
 </form>
 
 <script>
@@ -61,6 +60,66 @@
 
         // Update the input field with the calculated years, months, and days
         yearsOfWorkingInput.value = yearsDiff + " Years, " + monthsDiff + " Months, " + daysDiff + " Days";
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+
+<script>
+    async function confirmAdd() {
+        event.preventDefault();
+
+        // Get the form data
+        var formData = new FormData(document.getElementById("addExperienceForm"));
+        var proofFileInput = $('input[name="proof"]');
+        formData.append("proof", proofFileInput);
+
+        try {
+            const response = await fetch('@Url.Action("AddExperienceDetails")', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                showErrorMessage(errorMessage.message);
+                return;
+            }
+
+            const data = await response.json();
+            var message = data.message;
+            var redirectUrl = data.redirectUrl;
+            showSuccessMessage(message, redirectUrl);
+        } catch (error) {
+            showErrorMessage('An error occurred while Adding data In.');
+        }
+    }
+
+
+    function showSuccessMessage(message, redirectUrl) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Experience Details added succesfully',
+            text: message,
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            // Optionally, you can perform additional actions here after the user clicks OK
+            // For example, you can redirect the user to another page
+            if (result.isConfirmed) {
+                window.location.href = redirectUrl;
+            }
+        });
+    }
+
+    // Function to show the error message using SweetAlert
+    function showErrorMessage(errorMessage) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorMessage,
+            confirmButtonText: 'OK'
+        });
     }
 </script>
 

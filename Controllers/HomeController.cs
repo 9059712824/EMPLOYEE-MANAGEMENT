@@ -9,6 +9,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace EMPLOYEE_MANAGEMENT.Controllers
 {
@@ -97,13 +98,13 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EmailValidation(EmailDTO emailDTO)
+        public async Task<IActionResult> EmailValidation([FromBody] EmailDTO emailDTO)
         {
             var email = emailDTO.Email;
             var user = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
             if(user == null)
             {
-                return NotFound("Email Doesn't Exists " + email);
+                return BadRequest(new { message = "Email Not Exists "+emailDTO.Email });
             }
             if (TimeDifference(user.OTPGeneratedTime))
             {
@@ -182,6 +183,13 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             return View();
         }
 
+        public static bool IsValidEmail(string email)
+        {
+            // Regular expression for email validation
+            string emailPattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
+            return Regex.IsMatch(email, emailPattern, RegexOptions.IgnoreCase);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Add([FromBody]AddUserDTO user)
         {
@@ -190,6 +198,10 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 return BadRequest(new { message = "Invalid user data." });
             }
 
+            if (!IsValidEmail(user.Email))
+            {
+                return BadRequest(new { message = "Invalid Email Address" });
+            }
             var users = await applicationDbContext.Users.ToListAsync();
 
             foreach(var i in users)
@@ -304,8 +316,12 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUserDetails(UserDetails userDetails)
+        public async Task<IActionResult> AddUserDetails([FromBody] UserDetailsDTO userDetails)
         {
+            if (!ModelState.IsValid)
+            {
+                return NotFound("userDetaiils");
+            }
             String userId = HttpContext.Session.GetString("UserId");
             var newUser = await applicationDbContext.Users.FirstOrDefaultAsync(u => u.UserId == Guid.Parse(userId));
             if (newUser == null)
@@ -325,7 +341,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 Salary = userDetails.Salary,
                 User = newUser,
             };
-            var departments = await applicationDbContext.Departments.ToListAsync();
+            var departments = applicationDbContext.Departments.ToList();
             foreach (var i in departments)
             {
                 if (i.DepartmentName.ToLower() == userDetails.Department.ToLower())
@@ -336,7 +352,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             }
             if (NewUserDetails.DepartmentHead == Guid.Empty)
             {
-                return NotFound("Invalid Department");
+                return BadRequest(new { message = "Invalid Department Name" });
             }
             await applicationDbContext.UserDetails.AddAsync(NewUserDetails);
             await applicationDbContext.SaveChangesAsync();
@@ -345,7 +361,13 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
             applicationDbContext.Users.Update(newUser);
             await applicationDbContext.SaveChangesAsync();
 
-            return RedirectToAction("AddAcademicDetails");
+            var defaultResponse = new
+            {
+                message = "User Details Added Succesfully",
+                redirectUrl = Url.Action("ViewUserDetails", "Home")
+            };
+
+            return Ok(defaultResponse);
         }
 
         public async Task<IActionResult> UpdateUserDetails(Guid id)
@@ -420,6 +442,10 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                     newUserDetails.DepartmentHead = i.DepartmentHead;
                     newUserDetails.Department = i.DepartmentName;
                 }
+            }
+            if (String.IsNullOrEmpty(newUserDetails.Department))
+            {
+                return BadRequest(new { message = "Incorrect Departement Entered" });
             }
             newUserDetails.Salary = viewUserDetails.Salary;
 
@@ -598,7 +624,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 {
                     return BadRequest(new { message = "Education gap "+ (academicDetail.StartYear-schoolAcademicDetail.EndYear) + " Years Exists" });
                 }*/
-                else if (schoolAcademicDetail != null && academicDetail.StartYear < schoolAcademicDetail.EndYear)
+                if (schoolAcademicDetail != null && academicDetail.StartYear < schoolAcademicDetail.EndYear)
                 {
                     return BadRequest(new { message = "Invalid Input data of " + academicDetail.Name+ " Start Year" });
                 }
@@ -611,7 +637,7 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                     return BadRequest(new { message = "Education gap "+ (academicDetail.StartYear-intermediateOrDiplomaAcademicDetail.EndYear) + " Years Exists" });
                 }*/
 
-                else if (intermediateOrDiplomaAcademicDetail != null && academicDetail.StartYear < intermediateOrDiplomaAcademicDetail.EndYear)
+                if (intermediateOrDiplomaAcademicDetail != null && academicDetail.StartYear < intermediateOrDiplomaAcademicDetail.EndYear)
                 {
                     return BadRequest(new { message = "Invalid Input data of "+academicDetail.Name + " Start year" });
                 }
@@ -623,9 +649,26 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                 {
                     return BadRequest(new { message = "Education gap "+ (academicDetail.StartYear-bscOrBcaOrBTechAcademicDetail.EndYear) + " Years Exists" });
                 }*/
-                else  if (bscOrBcaOrBTechAcademicDetail != null && academicDetail.StartYear < bscOrBcaOrBTechAcademicDetail.EndYear)
+                if (bscOrBcaOrBTechAcademicDetail != null && academicDetail.StartYear < bscOrBcaOrBTechAcademicDetail.EndYear)
                 {
                     return BadRequest(new { message = "Invalid Input data of "+academicDetail.Name + " Start year" });
+                }
+            }
+
+            if(academicDetail.GradeType == "CGPA")
+            {
+                float value = float.Parse(academicDetail.Grade);
+                if(!(value>0 && value<=10))
+                {
+                    return BadRequest(new { message = "Invalid CGPA" });
+                }
+            }
+            if (academicDetail.GradeType == "Percentage")
+            {
+                float value = float.Parse(academicDetail.Grade);
+                if (!(value>0 && value<=100))
+                {
+                    return BadRequest(new { message = "Invalid Percentage" });
                 }
             }
 
@@ -640,6 +683,9 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                     var result = new AcademicDetails()
                     {
                         Name = academicDetail.Name,
+                        InstitutionName = academicDetail.InstitutionName,
+                        GradeType = academicDetail.GradeType,
+                        Grade = academicDetail.Grade,
                         StartYear = Convert.ToInt32(academicDetail.StartYear),
                         EndYear = Convert.ToInt32(academicDetail.EndYear),
                         proof = proofBytes,
@@ -704,11 +750,11 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
 
             if (newUser == null)
             {
-                throw new InvalidDataException(userId.ToString());
+                return BadRequest(new { message = "Invalid user" });
             }
             if(experience==null)
             {
-                throw new ArgumentNullException("invalid data" +experience);
+                return BadRequest(new { message = "Inavlid Experience Details" });
             }
             if (proof != null && proof.Length > 0)
             {
@@ -731,7 +777,12 @@ namespace EMPLOYEE_MANAGEMENT.Controllers
                     await applicationDbContext.SaveChangesAsync();
                 }
             }
-            return RedirectToAction("Index");
+            var defaultResponse = new
+            {
+                message = "Experience Details Added Successfully",
+                redirectUrl = Url.Action("ViewExperienceDetails", "Home")
+            };
+            return Ok(defaultResponse);
         }
 
         public async Task<IActionResult> ViewExperienceDetails()

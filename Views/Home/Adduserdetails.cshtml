@@ -1,23 +1,22 @@
-﻿@model EMPLOYEE_MANAGEMENT.Models.UserDetails
-@{
+﻿@{
     ViewBag.Title = "AddUserDetails";
 }
-<form method="post" action="AddUserDetails" class="mt-5">
+<form class="mt-5" id="addUserDetailsForm">
     <div class="mb-3">
         <label for="" class="form-label">FirstName</label>
-        <input type="text" class="form-control" id="FirstName" asp-for="FirstName" required>
+        <input type="text" class="form-control" id="FirstName"  required>
     </div>
     <div class="mb-3">
         <label for="" class="form-label">LastName</label>
-        <input type="text" class="form-control" id="FirstName" asp-for="LastName" required>
+        <input type="text" class="form-control" id="LastName"  required>
     </div>
     <div class="mb-3">
         <label for="" class="form-label">Number</label>
-        <input type="number" class="form-control" id="Number" asp-for="Number" required>
+        <input type="number" class="form-control" id="Number"  required>
     </div>
     <div class="mb-3">
         <label for="Gender" class="form-label">Gender</label>
-        <select class="form-control" id="Gender" asp-for="Gender" required>
+        <select class="form-control" id="Gender" required>
             <option value="">--select an option--</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
@@ -25,25 +24,25 @@
     </div>
     <div class="mb-3">
         <label for="DOB" class="form-label">DOB</label>
-        <input type="date" class="form-control" id="DOB" asp-for="DOB" onchange="calculateAge()" required>
+        <input type="date" class="form-control" id="DOB" onchange="calculateAge()" required>
     </div>
     <div class="mb-3">
         <label for="Age" class="form-label">Age</label>
-        <input type="number" class="form-control" id="Age" asp-for="Age" required readonly/>
+        <input type="number" class="form-control" id="Age" required readonly/>
     </div>
     <div class="mb-3">
         <label for="Address" class="form-label">Address</label>
-        <input type="text" class="form-control" id="Address" asp-for="Address" required>
+        <input type="text" class="form-control" id="Address" required>
     </div>
     <div class="mb-3">
         <label for="Salary" class="form-label">Salary</label>
-        <input type="number" class="form-control" id="Salary" asp-for="Salary" required>
+        <input type="number" class="form-control" id="Salary" required>
     </div>
     <div class="mb-3">
         <label for="Department" class="form-label">Department</label>
-        <input type="text" class="form-control" id="Department" asp-for="Department" required>
+        <input type="text" class="form-control" id="Department" required>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" onclick="confirmAdd()" class="btn btn-primary">Submit</button>
 </form>
 <script>
     function calculateAge() {
@@ -63,3 +62,69 @@
         document.getElementById('Age').value = age;
     }
 </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+<script>
+        function confirmAdd(event) {
+            event.preventDefault();
+        var userDetails = {
+            FirstName: document.getElementById('FirstName').value,
+            LastName: document.getElementById('LastName').value,
+            Number: parseFloat(document.getElementById('Number').value),
+            Gender: document.getElementById('Gender').value,
+            DOB: new Date(document.getElementById('DOB').value),
+            Age: parseInt(document.getElementById('Age').value),
+            Address: document.getElementById('Address').value,
+            Salary: parseFloat(document.getElementById('Salary').value),
+            Department: document.getElementById('Department').value
+        };
+
+        $.ajax({
+            url: '@Url.Action("AddUserDetails")',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(userDetails),
+            success: function (response) {
+                var message = response.message;
+                var redirectUrl = response.redirectUrl;
+                showSuccessMessage(message, redirectUrl);
+            },
+            error: function (xhr, status, error) {
+                // Handle the error response here
+                var errorMessage = "Incorrect Values";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                showErrorMessage(errorMessage);
+            }
+        });
+    }
+
+        document.getElementById("addUserDetailsForm").addEventListener("submit", confirmAdd);
+
+    function showSuccessMessage(message, redirectUrl) {
+
+            Swal.fire({
+                icon: 'success',
+                title: 'User Details Added',
+                text: message,
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                // Optionally, you can perform additional actions here after the user clicks OK
+                // For example, you can redirect the user to another page
+                if (result.isConfirmed) {
+                    window.location.href = redirectUrl;
+                }
+            });
+        }
+
+        // Function to show the error message using SweetAlert
+        function showErrorMessage(errorMessage) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>

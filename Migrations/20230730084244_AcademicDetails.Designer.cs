@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMPLOYEE_MANAGEMENT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230721102222_create")]
-    partial class create
+    [Migration("20230730084244_AcademicDetails")]
+    partial class AcademicDetails
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,56 +25,88 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.AcademicAndExperienceView", b =>
+            modelBuilder.Entity("EMPLOYEE_MANAGEMENT.DTO.AcademicDetailsView", b =>
                 {
-                    b.Property<int>("AcademicEndYear")
+                    b.Property<int>("EndYear")
                         .HasColumnType("int");
 
-                    b.Property<string>("AcademicFilename")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AcademicName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("AcademicProof")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<int>("AcademicStartYear")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("AcademicUserId")
+                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ExperienceCompanyName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ExperienceEndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ExperienceFilename")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("ExperienceProof")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<Guid>("ExperienceUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ExperienceYearsOfWorking")
+                    b.Property<int>("StartYear")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ExprienceStartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("fileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("proof")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.ToTable((string)null);
 
-                    b.ToView("AcademicsAndExperienceView", (string)null);
+                    b.ToView("academicDetailsView", (string)null);
+                });
+
+            modelBuilder.Entity("EMPLOYEE_MANAGEMENT.DTO.EmployeeDetails", b =>
+                {
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DOB")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("DepartmentHead")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Number")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Salary")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("EmployeeDetails", (string)null);
                 });
 
             modelBuilder.Entity("EMPLOYEE_MANAGEMENT.Models.AcademicDetails", b =>
@@ -85,6 +117,14 @@ namespace EMPLOYEE_MANAGEMENT.Migrations
 
                     b.Property<int>("EndYear")
                         .HasColumnType("int");
+
+                    b.Property<string>("Grade")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GradeType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()

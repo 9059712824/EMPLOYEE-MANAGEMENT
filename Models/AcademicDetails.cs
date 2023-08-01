@@ -13,6 +13,15 @@ namespace EMPLOYEE_MANAGEMENT.Models
         public String Name { get; set; }
 
         [Required]
+        public String InstitutionName { get; set; }
+
+        [Required]
+        public String GradeType { get; set;}
+
+        [Required]
+        public String Grade { get; set;}
+
+        [Required]
         public int StartYear { get; set; }
 
         [Required]

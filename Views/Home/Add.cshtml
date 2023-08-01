@@ -1,14 +1,15 @@
 ﻿@{
     ViewBag.Title = "Create";
 }
+
 <div class="mt-5">
     <div class="mb-3">
         <label for="Email" class="form-label">Email</label>
-        <input type="email" class="form-control" id="Email" Name="Email" required>
+        <input type="email" class="form-control" id="Email" required>
     </div>
     <div class="mb-3">
         <label for="Role" class="form-label">Role</label>
-        <select class="form-control" id="Role" Name="Role" required>
+        <select class="form-control" id="Role" required>
             @if (ViewBag.Role != "DEPARTMENT_HEAD")
             {
                 <option value="DEPARTMENT_HEAD">Department Head</option>
